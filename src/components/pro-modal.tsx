@@ -9,11 +9,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useProModal } from "../hooks/use-pro-modal";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/components/ui/use-toast";
+} from "@components/ui/dialog";
+import { useProModal } from "@hooks/use-pro-modal";
+import { Button } from "@components/ui/button";
+import { Separator } from "@components/ui/separator";
+import { useToast } from "@components/ui/use-toast";
 
 // Placeholder domain - replace with your actual domain(s) when ready
 const ALLOWED_DOMAINS = ["placeholder-domain.com"];
