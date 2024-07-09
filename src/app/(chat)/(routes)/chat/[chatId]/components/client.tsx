@@ -1,8 +1,8 @@
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import {ChatHeader} from "@/components/chat-header";
-import {ChatForm} from "@/components/chat-form";
-import { ChatMessages, ChatMessageProps } from "@/components/chat-message";
+import { ChatHeader } from "@components/chat-header";
+import { ChatForm } from "@components/chat-form";
+import { ChatMessages, ChatMessageProps } from "@components/chat-message";
 import { Companion, Message } from "@prisma/client";
 import { OpenAI } from "@langchain/openai";
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -26,30 +26,31 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [agent, setAgent] = useState<GenerativeAgent | null>(null);
 
+  // Function to initialize the GenerativeAgent
+  const setupAgent = async () => {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+    });
+
+    const vectorStore = new MemoryVectorStore(new OpenAIEmbeddings());
+    const retriever = new TimeWeightedVectorStoreRetriever({
+      vectorStore,
+      otherScoreKeys: ["importance"],
+      k: 15,
+    });
+
+    const agentMemory = new GenerativeAgentMemory(openai, retriever, { reflectionThreshold: 8 });
+    const agent = new GenerativeAgent(openai, agentMemory, {
+      name: "Companion",
+      age: 1,
+      traits: "helpful, friendly, talkative",
+      status: "ready to assist",
+    });
+
+    setAgent(agent);
+  };
+
   useEffect(() => {
-    const setupAgent = async () => {
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY!,
-      });
-
-      const vectorStore = new MemoryVectorStore(new OpenAIEmbeddings());
-      const retriever = new TimeWeightedVectorStoreRetriever({
-        vectorStore,
-        otherScoreKeys: ["importance"],
-        k: 15,
-      });
-
-      const agentMemory = new GenerativeAgentMemory(openai, retriever, { reflectionThreshold: 8 });
-      const agent = new GenerativeAgent(openai, agentMemory, {
-        name: "Companion",
-        age: 1,
-        traits: "helpful, friendly, talkative",
-        status: "ready to assist",
-      });
-
-      setAgent(agent);
-    };
-
     setupAgent();
   }, []);
 
@@ -67,7 +68,6 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
 
     try {
       const response = await agent.generateDialogueResponse(`USER says ${input}`);
-
       const systemMessage: ChatMessageProps = {
         role: "system",
         content: response[1], // response is a tuple [boolean, string]

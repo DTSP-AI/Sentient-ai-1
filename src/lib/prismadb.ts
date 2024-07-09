@@ -1,11 +1,22 @@
+// src/lib/prismadb.ts
 import { PrismaClient } from '@prisma/client';
+import { withPulse } from '@prisma/extension-pulse';
+import dotenv from 'dotenv';
+import path from 'path';
 
-declare global {
-  var prisma: PrismaClient | undefined;
+// Load the .env.local file
+dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
+
+const prismaClientSingleton = () => {
+  return new PrismaClient().$extends(withPulse());
 }
 
-const prisma = globalThis.prisma || new PrismaClient();
+declare const globalThis: {
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
+} & typeof global;
 
-if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma;
+const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
+
+if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma;
 
 export default prisma;

@@ -1,6 +1,6 @@
 import { useTheme } from "next-themes";
 import { useToast } from "./ui/use-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { BotAvatar } from "./bot-avatar";
 import { BeatLoader } from "react-spinners";
 import { UserAvatar } from "./user-avatar";

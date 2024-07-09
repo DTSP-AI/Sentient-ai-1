@@ -1,11 +1,20 @@
-import { getAuth } from "@clerk/nextjs/server";
-import prismadb from "@/lib/prismadb";
+import { auth } from "@clerk/nextjs/server";
+import prismadb from "./prismadb";
 import type { NextRequest } from "next/server";
 
 const DAY_IN_MS = 86_400_000;
 
 export const checkSubscription = async (req: NextRequest) => {
-  const { userId } = getAuth(req);
+  console.log('checkSubscription called');
+
+  // Bypass subscription check in development mode
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Development mode - skipping subscription check');
+    return true;
+  }
+
+  const { userId } = auth();
+  console.log('userId: ', userId);
 
   if (!userId) {
     return false;

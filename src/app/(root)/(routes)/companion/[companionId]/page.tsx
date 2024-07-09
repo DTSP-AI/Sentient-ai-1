@@ -1,38 +1,38 @@
 import prismadb from "@/lib/prismadb";
 import { CompanionForm } from "./components/companion-form";
-import { getAuth } from "@clerk/nextjs/server";
-import { RedirectToSignIn } from "@clerk/nextjs";
-import type { NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
 interface CompanionIdPageProps {
-  params: {
-    companionId: string;
-  };
-  req: NextRequest;
+    params: {
+        companionId: string;
+    }
 }
 
-const CompanionIdPage = async ({ params, req }: CompanionIdPageProps) => {
-  const { userId } = getAuth(req);
+const CompanionIdPage = async ({
+    params
+}: CompanionIdPageProps) => {
+    const {userId} = auth();
+    // TODO: Check subscription
 
-  if (!userId) {
-    return <RedirectToSignIn />;
-  }
+    if (!userId) {
+        return auth().redirectToSignIn();
+    }
 
-  const companion = await prismadb.companion.findUnique({
-    where: {
-      id: params.companionId,
-      userId,
-    },
-  });
+    const companion = await prismadb.companion.findUnique({
+        where: {
+            id: params.companionId,
+            userId
+        }
+    })
 
-  const categories = await prismadb.category.findMany();
+    const categories = await prismadb.category.findMany();
 
-  return (
-    <CompanionForm
-      initialData={companion}
-      categories={categories}
-    />
-  );
-};
-
+    return (  
+        <CompanionForm
+        initialData={companion}
+        categories={categories}
+        />
+    );
+}
+ 
 export default CompanionIdPage;

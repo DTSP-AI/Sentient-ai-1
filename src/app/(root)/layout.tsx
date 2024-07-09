@@ -1,6 +1,6 @@
-import { Navbar } from "@/components/navbar";
-import { Sidebar } from "@/components/sidebar";
-import { checkSubscription } from "@/lib/subscription";
+import { Navbar } from "@components/navbar";
+import { Sidebar } from "@components/sidebar";
+import { checkSubscription } from "@lib/subscription";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
