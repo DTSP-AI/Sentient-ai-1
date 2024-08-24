@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\lib\subscription.ts
+
 import { auth } from "@clerk/nextjs/server";
 import prismadb from "./prismadb";
 import type { NextRequest } from "next/server";

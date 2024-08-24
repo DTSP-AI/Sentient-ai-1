@@ -5,13 +5,13 @@ import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
 import { checkSubscription } from "@/lib/subscription";
 import { CompanionForm } from "./components/companion-form";
-import { NextRequest } from "next/server"; // Keep NextRequest if you're passing it to checkSubscription
+import { NextRequest } from "next/server";
 
 interface CompanionIdPageProps {
   params: {
     companionId: string;
   };
-  req: NextRequest; // Required if checkSubscription needs it
+  req: NextRequest;
 }
 
 // Function to retrieve companion data from the database

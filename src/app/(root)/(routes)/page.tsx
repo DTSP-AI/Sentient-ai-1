@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(root)\(routes)\page.tsx
+
 import { Categories } from "@components/categories";
 import { Companions } from "@components/companions";
 import { SearchInput } from "@components/search-input";
