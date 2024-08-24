@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@lib/utils";
 import { UserButton } from "@clerk/nextjs";
 import { Sparkles } from "lucide-react";
 import { Poppins } from "next/font/google";
@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { ModeToggle } from "./mode-toggle";
 import { MobileSidebar } from "./mobile-sidebar";
-import { useProModal } from "../hooks/use-pro-modal";
+import { useProModal } from "@hooks/use-pro-modal";
 
 const font = Poppins({
     weight: "600",
