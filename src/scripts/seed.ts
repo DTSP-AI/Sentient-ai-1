@@ -1,15 +1,17 @@
-import { PrismaClient } from "@prisma/client";
-import { withPulse } from '@prisma/extension-pulse';
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\scripts\seed.ts
+
+import { PrismaClient } from "@prisma/client/edge";
+import { withAccelerate } from '@prisma/extension-accelerate';
 import dotenv from "dotenv";
 import path from 'path';
 
-// Load environment variables from .env.local in the root directory
-dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
+// Load environment variables from .env in the root directory
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
 console.log("DIRECT_DATABASE_URL:", process.env.DIRECT_DATABASE_URL);
 
-const prisma = new PrismaClient().$extends(withPulse());
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 async function main() {
     try {

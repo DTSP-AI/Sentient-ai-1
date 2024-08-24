@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(root)\layout.tsx
+
 import { Navbar } from "@components/navbar";
 import { Sidebar } from "@components/sidebar";
 import { checkSubscription } from "@lib/subscription";

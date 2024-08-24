@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(chat)\(routes)\chat\[chatId]\page.tsx
+
 import prismadb from "@lib/prismadb";
 import { getAuth } from "@clerk/nextjs/server";
 import { RedirectToSignIn } from "@clerk/nextjs";

@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\stripe\route.ts
+
 import { NextResponse, NextRequest } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/clerk-sdk-node";
