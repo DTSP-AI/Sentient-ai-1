@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\companion\[companionId]\route.ts
+
 import prismadb from "@/lib/prismadb";
 import { checkSubscription } from "@/lib/subscription";
 import { currentUser } from "@clerk/nextjs/server";
