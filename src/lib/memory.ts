@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { FaissStore } from '@langchain/community/vectorstores/faiss';
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { OpenAIEmbeddings } from '@langchain/openai';
-import { Document } from "@langchain/core/documents";
+import { GenerativeAgentMemory } from "langchain/experimental/generative_agents";
+import { TimeWeightedVectorStoreRetriever } from "langchain/retrievers/time_weighted";
+import { createFaissIndex, searchFaissIndex } from './faissservice';
 
 export type CompanionKey = {
   companionName: string;
@@ -12,32 +14,44 @@ export type CompanionKey = {
 export class MemoryManager {
   private static instance: MemoryManager;
   private prisma: PrismaClient;
-  private vectorStore: FaissStore;
+  private agentMemory: GenerativeAgentMemory;
 
-  private constructor() {
+  private constructor(llm: any) {
     this.prisma = new PrismaClient();
     const embeddings = new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY });
-    this.vectorStore = new FaissStore(embeddings, {});  // FaissStore needs an options object, even if empty.
+
+    const memoryRetriever = new TimeWeightedVectorStoreRetriever({
+      vectorStore: new FaissStore(embeddings, {}),  // Initialize with empty options
+      otherScoreKeys: ["importance"],
+      k: 15,
+    });
+
+    this.agentMemory = new GenerativeAgentMemory(
+      llm,
+      memoryRetriever,
+      {
+        reflectionThreshold: 8,
+        importanceWeight: 0.15,
+        verbose: true,
+        maxTokensLimit: 1200,
+      }
+    );
   }
 
-  public static async getInstance(): Promise<MemoryManager> {
+  public static async getInstance(llm: any): Promise<MemoryManager> {
     if (!MemoryManager.instance) {
-      MemoryManager.instance = new MemoryManager();
+      MemoryManager.instance = new MemoryManager(llm);
     }
     return MemoryManager.instance;
   }
 
   public async addToVectorStore(texts: string[], metadata: any[]): Promise<void> {
-    const documents = texts.map((text, index) => ({
-      pageContent: text,
-      metadata: metadata[index],
-    }));
-
-    await this.vectorStore.addDocuments(documents as Document<Record<string, any>>[]);
+    await createFaissIndex(texts, metadata);
   }
 
   public async similaritySearch(query: string, topK: number): Promise<any[]> {
-    return await this.vectorStore.similaritySearch(query, topK);
+    const results = await searchFaissIndex(query, topK);
+    return results.documents; // Adjust this based on your actual return structure
   }
 
   public async writeToHistory(text: string, companionKey: CompanionKey): Promise<void> {
@@ -54,6 +68,8 @@ export class MemoryManager {
         role: 'user',
       },
     });
+
+    await this.agentMemory.addMemory(text, new Date(), { userId: companionKey.userId, companionId: companionKey.companionName });
   }
 
   public async readLatestHistory(companionKey: CompanionKey): Promise<string[]> {

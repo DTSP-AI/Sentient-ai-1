@@ -1,3 +1,4 @@
+// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\categories.tsx
 "use client";
 
 import qs from "query-string";

@@ -23,7 +23,7 @@ export const Companions = ({
                     fill
                     className="grayscale"
                     alt="Empty"
-                    src="/empty.png"
+                    src="/images/Empty.png"
                     />
                 </div>
                 <p className="text-sm text-muted-foreground">

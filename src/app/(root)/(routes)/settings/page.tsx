@@ -1,5 +1,5 @@
-import { SubscriptionButton } from "@/components/subscription-button";
-import { checkSubscription } from "@/lib/subscription";
+import { SubscriptionButton } from "@components/subscription-button";
+import { checkSubscription } from "@lib/subscription";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 

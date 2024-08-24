@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@components/ui/button";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
@@ -15,7 +15,8 @@ export const SubscriptionButton = ({
 }: SubscriptionButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
+  const isDev = process.env.NODE_ENV === 'development';
+  
   const onClick = async () => {
     try {
       setLoading(true);
@@ -28,7 +29,19 @@ export const SubscriptionButton = ({
       setLoading(false);
     }
   };
-
+  
+  if (isDev) {
+    return (
+      <Button
+        disabled
+        size="sm"
+        variant="default"
+      >
+        Development Mode: Upgrade Disabled
+      </Button>
+    );
+  }
+  
   return (
     <Button
       onClick={onClick}
