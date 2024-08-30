@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\layout.tsx
+
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'

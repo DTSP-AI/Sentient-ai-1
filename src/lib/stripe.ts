@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\lib\stripe.ts
+
 import Stripe from "stripe";
 
 export const stripe = new Stripe(process.env.STRIPE_API_KEY!, {

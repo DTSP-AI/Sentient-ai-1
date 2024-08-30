@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(auth)\layout.tsx
+
 const AuthLayout = ({
     children
 }: {

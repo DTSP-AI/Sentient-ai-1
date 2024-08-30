@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\companions.tsx
+
 import { Companion } from "@prisma/client";
 import Image from "next/image";
 import { Card, CardFooter, CardHeader } from "./ui/card";

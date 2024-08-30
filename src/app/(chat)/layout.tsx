@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(chat)\layout.tsx
+
 const ChatLayout = ({
     children
 }: {

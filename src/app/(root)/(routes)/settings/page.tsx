@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(root)\(routes)\settings\page.tsx
+
 import { SubscriptionButton } from "@components/subscription-button";
 import { checkSubscription } from "@lib/subscription";
 import { headers } from "next/headers";

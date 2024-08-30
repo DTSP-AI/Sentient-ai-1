@@ -1,3 +1,5 @@
+// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\lib\faissservice.ts
+
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { TimeWeightedVectorStoreRetriever } from "langchain/retrievers/time_weighted";
@@ -10,13 +12,13 @@ interface SearchResult {
 // Function to create and save FAISS index
 export const createFaissIndex = async (texts: string[], metadata: any[]): Promise<void> => {
   const vectorStore = await FaissStore.fromTexts(texts, metadata, new OpenAIEmbeddings());
-  const directory = path.join(__dirname, 'faiss_index');
+  const directory = path.join(process.cwd(), 'faiss_index');  // Changed __dirname to process.cwd() for a consistent path
   await vectorStore.save(directory);
 };
 
 // Function to search FAISS index using TimeWeightedVectorStoreRetriever
 export const searchFaissIndex = async (query: string, k: number): Promise<{ documents: SearchResult[], distances: number[], indices: number[] }> => {
-  const directory = path.join(__dirname, 'faiss_index');
+  const directory = path.join(process.cwd(), 'faiss_index');  // Changed __dirname to process.cwd() for a consistent path
   const vectorStore = await FaissStore.load(directory, new OpenAIEmbeddings());
 
   const retriever = new TimeWeightedVectorStoreRetriever({

@@ -42,7 +42,7 @@
     "eslint-config-next": "",
     "faiss-node": "",
     "lucide-react": "",
-    "next": "",
+    "next": "^14.2.7",
     "next-cloudinary": "",
     "next-themes": "",
     "openai": "",

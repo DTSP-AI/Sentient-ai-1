@@ -1,4 +1,6 @@
-"use client"
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\ui\toaster.tsx
+
+"use client";
 
 import {
   Toast,
