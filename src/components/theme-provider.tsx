@@ -1,4 +1,6 @@
-"use client"
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\theme-provider.tsx
+
+"use client";
 
 import * as React from "react"
 import { ThemeProvider as NextThemesProvider } from "next-themes"

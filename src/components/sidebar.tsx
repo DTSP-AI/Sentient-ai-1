@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\sidebar.tsx
+
 "use client";
 
 import { useProModal } from "@hooks/use-pro-modal";

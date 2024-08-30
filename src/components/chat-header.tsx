@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\chat-header.tsx
+
 "use client";
 
 import { Companion, Message } from "@prisma/client";

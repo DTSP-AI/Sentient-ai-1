@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\user-avatar.tsx
+
 "use client";
 
 import { useUser } from "@clerk/nextjs";

@@ -1,5 +1,4 @@
 {
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/(root)/(routes)/page": "app/(root)/(routes)/page.js",
-  "/(root)/(routes)/companion/[companionId]/page": "app/(root)/(routes)/companion/[companionId]/page.js"
+  "/(chat)/(routes)/chat/[chatId]/page": "app/(chat)/(routes)/chat/[chatId]/page.js",
+  "/(root)/(routes)/page": "app/(root)/(routes)/page.js"
 }

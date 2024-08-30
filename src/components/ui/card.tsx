@@ -1,5 +1,6 @@
-import * as React from "react"
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\ui\card.tsx
 
+import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<
