@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(root)\(routes)\companion\[companionId]\components\companion-form.tsx
+
 "use client";
 
 import axios from "axios";
@@ -44,7 +46,7 @@ const formSchema = z.object({
     seed: z.string().min(200, { message: "Seed requires at least 200 characters." }),
     src: z.string().min(1, { message: "Image is required." }),
     categoryId: z.string().min(1, { message: "Category is required." }),
-    age: z.number().min(1, { message: "Age is required." }),
+    age: z.preprocess((val) => Number(val), z.number().min(1, { message: "Age is required." })), // Ensuring age is treated as a number
     traits: z.string().min(1, { message: "Traits are required." }),
     status: z.string().min(1, { message: "Status is required." }),
 });

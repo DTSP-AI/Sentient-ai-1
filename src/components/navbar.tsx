@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\navbar.tsx
+
 "use client";
 
 import { cn } from "@lib/utils";

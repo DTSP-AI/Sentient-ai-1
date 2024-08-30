@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\chat\[chatId]\route.ts
+
 import { getAuth } from "@clerk/nextjs/server";
 import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { CallbackManager } from "@langchain/core/callbacks/manager";

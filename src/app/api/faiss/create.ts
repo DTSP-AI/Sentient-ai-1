@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\faiss\create.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createFaissIndex } from '../../../lib/faissservice';
 

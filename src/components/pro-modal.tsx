@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\pro-modal.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,7 +18,7 @@ import { Separator } from "@components/ui/separator";
 import { useToast } from "@components/ui/use-toast";
 
 // Placeholder domain - replace with your actual domain(s) when ready
-const ALLOWED_DOMAINS = ["placeholder-domain.com"];
+const ALLOWED_DOMAINS = ["localhost"];
 
 export const ProModal = () => {
   const proModal = useProModal();

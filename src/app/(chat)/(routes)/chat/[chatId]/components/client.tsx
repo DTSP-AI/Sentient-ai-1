@@ -1,3 +1,7 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(chat)\(routes)\chat\[chatId]\components\client.tsx
+
+"use client";
+
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ChatHeader } from "@components/chat-header";

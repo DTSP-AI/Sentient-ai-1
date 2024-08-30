@@ -1,3 +1,7 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\chat-form.tsx
+
+"use client";
+
 import { ChangeEvent, FormEvent } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -25,7 +29,7 @@ export const ChatForm = ({
         placeholder="Type a message"
         className="rounded-lg bg-primary/10"
       />
-      <Button disabled={isLoading} variant="ghost">
+      <Button type="submit" disabled={isLoading} variant="ghost">
         <SendHorizonal className="h-6 w-6" />
       </Button>
     </form>

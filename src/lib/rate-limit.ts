@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\lib\rate-limit.ts
+
 import { getAuth } from "@clerk/nextjs/server";
 import prismadb from "./prismadb";
 import type { NextRequest } from "next/server";

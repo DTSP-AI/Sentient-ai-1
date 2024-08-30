@@ -1,3 +1,5 @@
+// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\lib\memory.ts
+
 import { PrismaClient } from '@prisma/client';
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { OpenAIEmbeddings } from '@langchain/openai';
@@ -21,7 +23,7 @@ export class MemoryManager {
     const embeddings = new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY });
 
     const memoryRetriever = new TimeWeightedVectorStoreRetriever({
-      vectorStore: new FaissStore(embeddings, {}),  // Initialize with empty options
+      vectorStore: new FaissStore(embeddings, {}),  // Ensure compatibility
       otherScoreKeys: ["importance"],
       k: 15,
     });
@@ -46,11 +48,11 @@ export class MemoryManager {
   }
 
   public async addToVectorStore(texts: string[], metadata: any[]): Promise<void> {
-    await createFaissIndex(texts, metadata);
+    await createFaissIndex(texts, metadata);  // Ensure correct path handling
   }
 
   public async similaritySearch(query: string, topK: number): Promise<any[]> {
-    const results = await searchFaissIndex(query, topK);
+    const results = await searchFaissIndex(query, topK);  // Ensure correct path handling
     return results.documents; // Adjust this based on your actual return structure
   }
 

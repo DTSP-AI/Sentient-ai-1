@@ -1,24 +1,25 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(chat)\(routes)\chat\[chatId]\page.tsx
+
 import prismadb from "@lib/prismadb";
-import { getAuth } from "@clerk/nextjs/server";
-import { RedirectToSignIn } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ChatClient } from "./components/client";
-import type { NextRequest } from "next/server";
 
 interface ChatIdPageProps {
   params: {
     chatId: string;
   };
-  req: NextRequest;
 }
 
-const ChatIdPage = async ({ params, req }: ChatIdPageProps) => {
-  const { userId } = getAuth(req);
+const ChatIdPage = async ({ params }: ChatIdPageProps) => {
+  const { userId } = auth();
 
   if (!userId) {
-    return <RedirectToSignIn />;
+    // Redirect to sign in if the user is not authenticated
+    return redirect("/sign-in"); // Using server-side redirect instead of a client-side component
   }
 
+  // Fetch the companion and its messages from the database
   const companion = await prismadb.companion.findUnique({
     where: {
       id: params.chatId,
@@ -41,9 +42,11 @@ const ChatIdPage = async ({ params, req }: ChatIdPageProps) => {
   });
 
   if (!companion) {
+    // If no companion is found, redirect to the home page
     return redirect("/");
   }
 
+  // Render the ChatClient component with the companion data
   return <ChatClient companion={companion} />;
 };
 
