@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\subscription-button.tsx
+
 "use client";
 
 import { Button } from "@components/ui/button";

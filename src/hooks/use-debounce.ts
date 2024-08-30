@@ -1,3 +1,7 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\hooks\use-debounce.ts
+
+"use client";
+
 import { useEffect, useState } from "react";
 
 export function useDebounce<T>(value: T, delay?: number): T {

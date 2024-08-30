@@ -1,3 +1,5 @@
+"use client";
+
 import { useTheme } from "next-themes";
 import { useToast } from "./ui/use-toast";
 import { cn } from "../lib/utils";
@@ -7,7 +9,7 @@ import { UserAvatar } from "./user-avatar";
 import { Button } from "./ui/button";
 import { Copy } from "lucide-react";
 import { Companion } from "@prisma/client";
-import { ElementRef, useEffect, useRef, useState } from "react";
+import { ElementRef, useEffect, useRef } from "react";
 
 export interface ChatMessageProps {
   role: "system" | "user";
@@ -73,18 +75,6 @@ export const ChatMessages = ({
 }: ChatMessagesProps) => {
   const scrollRef = useRef<ElementRef<"div">>(null);
 
-  const [fakeLoading, setFakeLoading] = useState(messages.length === 0);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setFakeLoading(false);
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, []);
-
   useEffect(() => {
     scrollRef?.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
@@ -92,7 +82,6 @@ export const ChatMessages = ({
   return (
     <div className="flex-1 overflow-y-auto pr-4">
       <ChatMessage
-        isLoading={fakeLoading}
         src={companion.src}
         role="system"
         content={`Hello, I am ${companion.name}, ${companion.description}`}

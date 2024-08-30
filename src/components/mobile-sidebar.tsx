@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\mobile-sidebar.tsx
+
 import { Menu } from "lucide-react";
 import {Sheet, SheetContent, SheetTrigger} from "@components/ui/sheet";
 import { Sidebar } from "./sidebar";

@@ -1,4 +1,6 @@
-"use client"
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\ui\separator.tsx
+
+"use client";
 
 import * as React from "react"
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
