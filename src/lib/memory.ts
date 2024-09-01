@@ -5,7 +5,6 @@ import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { GenerativeAgentMemory } from "langchain/experimental/generative_agents";
 import { TimeWeightedVectorStoreRetriever } from "langchain/retrievers/time_weighted";
-import { createFaissIndex, searchFaissIndex } from './faissservice';
 
 export type CompanionKey = {
   companionName: string;
@@ -22,12 +21,15 @@ export class MemoryManager {
     this.prisma = new PrismaClient();
     const embeddings = new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY });
 
+    // Initialize FAISS vector store and retriever
+    const vectorStore = new FaissStore(embeddings, {});
     const memoryRetriever = new TimeWeightedVectorStoreRetriever({
-      vectorStore: new FaissStore(embeddings, {}),  // Ensure compatibility
+      vectorStore: vectorStore,
       otherScoreKeys: ["importance"],
       k: 15,
     });
 
+    // Use GenerativeAgentMemory to handle memory management
     this.agentMemory = new GenerativeAgentMemory(
       llm,
       memoryRetriever,
@@ -47,21 +49,16 @@ export class MemoryManager {
     return MemoryManager.instance;
   }
 
-  public async addToVectorStore(texts: string[], metadata: any[]): Promise<void> {
-    await createFaissIndex(texts, metadata);  // Ensure correct path handling
-  }
-
-  public async similaritySearch(query: string, topK: number): Promise<any[]> {
-    const results = await searchFaissIndex(query, topK);  // Ensure correct path handling
-    return results.documents; // Adjust this based on your actual return structure
-  }
-
   public async writeToHistory(text: string, companionKey: CompanionKey): Promise<void> {
     if (!companionKey.userId) {
       console.error("Companion key set incorrectly");
       return;
     }
 
+    // Add the memory using GenerativeAgentMemory's method
+    await this.agentMemory.addMemory(text, new Date(), { userId: companionKey.userId, companionId: companionKey.companionName });
+    
+    // Also store the message in Prisma if needed for persistent storage
     await this.prisma.message.create({
       data: {
         content: text,
@@ -70,8 +67,6 @@ export class MemoryManager {
         role: 'user',
       },
     });
-
-    await this.agentMemory.addMemory(text, new Date(), { userId: companionKey.userId, companionId: companionKey.companionName });
   }
 
   public async readLatestHistory(companionKey: CompanionKey): Promise<string[]> {
@@ -101,8 +96,9 @@ export class MemoryManager {
     }
   }
 
-  public async vectorSearch(recentChatHistory: string[], companionFileName: string): Promise<any[]> {
+  public async vectorSearch(recentChatHistory: string[], topK: number = 5): Promise<string[]> {
     const query = recentChatHistory.join(" ");
-    return await this.similaritySearch(query, 5); // Assuming top 5 results
+    const results = await this.agentMemory.memoryRetriever.getRelevantDocuments(query);
+    return results.map(doc => doc.pageContent);
   }
 }
