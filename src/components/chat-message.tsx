@@ -45,7 +45,7 @@ const ChatMessage = ({ role, content, isLoading, src }: ChatMessageProps) => {
         role === "user" && "justify-end"
       )}
     >
-      {role !== "user" && src && <BotAvatar src={src} />}
+      {role !== "user" && src && <BotAvatar src={src ?? "/images/default-avatar.png"} />} {/* Provide default avatar */}
       <div className="rounded-md px-4 py-2 max-w-sm text-sm bg-primary/10">
         {isLoading ? (
           <BeatLoader size={5} color={theme === "light" ? "black" : "white"} />
@@ -79,23 +79,25 @@ export const ChatMessages = ({
     scrollRef?.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
+  const avatarSrc = companion.src ?? "/images/default-avatar.png"; // Ensure avatarSrc is always a string
+
   return (
     <div className="flex-1 overflow-y-auto pr-4">
       <ChatMessage
-        src={companion.src}
+        src={avatarSrc}
         role="system"
-        content={`Hello, I am ${companion.name}, ${companion.description}`}
+        content={`Hello, I am ${companion.name}, ${companion.characterDescription}`}
       />
       {messages.map((message) => (
         <ChatMessage
           key={message.content}
           role={message.role}
           content={message.content}
-          src={companion.src}
+          src={avatarSrc}
         />
       ))}
       {isLoading && (
-        <ChatMessage role="system" src={companion.src} isLoading />
+        <ChatMessage role="system" src={avatarSrc} isLoading />
       )}
       <div ref={scrollRef} />
     </div>

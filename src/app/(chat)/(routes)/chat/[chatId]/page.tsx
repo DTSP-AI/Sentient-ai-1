@@ -1,9 +1,8 @@
-//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(chat)\(routes)\chat\[chatId]\page.tsx
-
 import prismadb from "@lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ChatClient } from "./components/client";
+import { Companion, Message } from "@prisma/client";
 
 interface ChatIdPageProps {
   params: {
@@ -11,15 +10,27 @@ interface ChatIdPageProps {
   };
 }
 
+type CharacterDescription = {
+  physicalAppearance: string;
+  identity: string;
+  interactionStyle: string;
+};
+
+type CompanionWithMessages = Companion & {
+  messages: Message[];
+  _count: {
+    messages: number;
+  };
+  characterDescription: CharacterDescription;
+};
+
 const ChatIdPage = async ({ params }: ChatIdPageProps) => {
   const { userId } = auth();
 
   if (!userId) {
-    // Redirect to sign in if the user is not authenticated
-    return redirect("/sign-in"); // Using server-side redirect instead of a client-side component
+    return redirect("/sign-in");
   }
 
-  // Fetch the companion and its messages from the database
   const companion = await prismadb.companion.findUnique({
     where: {
       id: params.chatId,
@@ -42,12 +53,19 @@ const ChatIdPage = async ({ params }: ChatIdPageProps) => {
   });
 
   if (!companion) {
-    // If no companion is found, redirect to the home page
     return redirect("/");
   }
 
-  // Render the ChatClient component with the companion data
-  return <ChatClient companion={companion} />;
+  // Parse the characterDescription JSON
+  const characterDescription = companion.characterDescription as CharacterDescription;
+
+  // Create a new object that matches the CompanionWithMessages type
+  const companionWithParsedDescription: CompanionWithMessages = {
+    ...companion,
+    characterDescription,
+  };
+
+  return <ChatClient companion={companionWithParsedDescription} />;
 };
 
 export default ChatIdPage;

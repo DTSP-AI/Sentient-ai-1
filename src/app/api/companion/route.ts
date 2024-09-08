@@ -9,13 +9,13 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const user = await currentUser();
-    const { src, name, description, instructions, seed, categoryId, age, traits, status } = body;
+    const { name, characterDescription, categoryId } = body;
 
     if (!user || !user.id || !user.firstName) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!src || !name || !description || !instructions || !seed || !categoryId || age === undefined || !traits || !status) {
+    if (!name || !characterDescription || !categoryId) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
@@ -29,16 +29,10 @@ export async function POST(req: NextRequest) {
       data: {
         categoryId,
         userId: user.id,
-        userName: user.firstName,
-        src,
+        userName: user.firstName || "Unknown", // Ensure userName is not null
         name,
-        description,
-        instructions,
-        seed,
-        age,
-        traits,
-        status,
-      }
+        characterDescription,
+      },
     });
 
     return NextResponse.json(companion);
