@@ -56,7 +56,7 @@ export const Companions = ({
                                 {item.name}
                             </p>
                             <p className="text-xs">
-                                {item.description || "No description available"} {/* Updated to use shortDescription */}
+                                {item.shortDescription || "No description available"} {/* Updated to use shortDescription */}
                             </p>
                         </CardHeader>
                         <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">

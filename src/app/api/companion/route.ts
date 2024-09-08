@@ -3,19 +3,20 @@
 import prismadb from "@/lib/prismadb";
 import { checkSubscription } from "@/lib/subscription";
 import { currentUser } from "@clerk/nextjs/server";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const user = await currentUser();
-    const { name, characterDescription, categoryId } = body;
+    const { name, characterDescription, categoryId, shortDescription, src } = body;
 
     if (!user || !user.id || !user.firstName) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!name || !characterDescription || !categoryId) {
+    if (!name || !characterDescription || !categoryId || !shortDescription || !src) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
@@ -29,9 +30,11 @@ export async function POST(req: NextRequest) {
       data: {
         categoryId,
         userId: user.id,
-        userName: user.firstName || "Unknown", // Ensure userName is not null
+        userName: user.firstName,
         name,
-        characterDescription,
+        src,
+        characterDescription: characterDescription as Prisma.InputJsonValue,
+        shortDescription,
       },
     });
 

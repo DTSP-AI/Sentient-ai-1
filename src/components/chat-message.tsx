@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\chat-message.tsx
+
 "use client";
 
 import { useTheme } from "next-themes";
