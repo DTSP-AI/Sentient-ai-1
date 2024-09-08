@@ -21,29 +21,29 @@ interface ChatHeaderProps {
     }
 }
 
-export const ChatHeader = ({
-    companion
-}: ChatHeaderProps) => {
+export const ChatHeader = ({ companion }: ChatHeaderProps) => {
     const router = useRouter();
-    const {user} = useUser();
-    const {toast} = useToast();
+    const { user } = useUser();
+    const { toast } = useToast();
 
     const onDelete = async () => {
         try {
             await axios.delete(`/api/companion/${companion.id}`);
-
             toast({
                 description: "Success."
-            })
+            });
             router.refresh();
             router.push("/");
         } catch (error) {
             toast({
                 description: "Something went wrong.",
                 variant: "destructive"
-            })
+            });
         }
     }
+
+    // Ensure src is a string by providing a default value
+    const avatarSrc = companion.src ?? "/images/default-avatar.png";
 
     return (
         <div className="flex w-full justify-between items-center border-b border-primary/10 pb-4">
@@ -51,7 +51,7 @@ export const ChatHeader = ({
                 <Button onClick={() => router.back()} size="icon" variant="ghost">
                     <ChevronLeft className="h-8 w-8" />
                 </Button>
-                <BotAvatar src={companion.src} />
+                <BotAvatar src={avatarSrc} /> {/* This is always a string now */}
                 <div className="flex flex-col gap-y-1">
                     <div className="flex items-center gap-x-2">
                         <p className="font-bold">
@@ -87,5 +87,5 @@ export const ChatHeader = ({
                 </DropdownMenu>
             )}
         </div>
-    )
-}
+    );
+};

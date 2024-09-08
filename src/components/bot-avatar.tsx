@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\bot-avatar.tsx
+
 import { Avatar, AvatarImage } from "./ui/avatar";
 
 interface BotAvatarProps {
