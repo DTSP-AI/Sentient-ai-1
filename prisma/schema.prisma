@@ -17,22 +17,17 @@ model Category {
 }
 
 model Companion {
-  id           String    @id @default(uuid())
-  userId       String
-  userName     String
-  src          String
-  name         String
-  description  String
-  instructions String
-  seed         String
-  age          Int
-  traits       String
-  status       String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @default(now()) @updatedAt
-  categoryId   String
-  category     Category  @relation(fields: [categoryId], references: [id])
-  messages     Message[]
+  id                   String    @id @default(uuid())
+  userId               String
+  userName             String
+  name                 String
+  shortDescription     String
+  characterDescription Json      // New field to store character_description.json
+  categoryId           String
+  category             Category  @relation(fields: [categoryId], references: [id])
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now()) @updatedAt
+  messages             Message[]
 
   @@index([categoryId])
 }
