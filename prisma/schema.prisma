@@ -21,13 +21,13 @@ model Companion {
   userId               String
   userName             String
   name                 String
-  src                  String
   shortDescription     String
-  characterDescription Json      // New field to store character_description.json
+  characterDescription Json
   categoryId           String
-  category             Category  @relation(fields: [categoryId], references: [id])
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @default(now()) @updatedAt
+  src                  String
+  category             Category  @relation(fields: [categoryId], references: [id])
   messages             Message[]
 
   @@index([categoryId])
