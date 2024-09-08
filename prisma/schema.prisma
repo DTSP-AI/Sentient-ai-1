@@ -21,6 +21,7 @@ model Companion {
   userId               String
   userName             String
   name                 String
+  src                  String
   shortDescription     String
   characterDescription Json      // New field to store character_description.json
   categoryId           String
