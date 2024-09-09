@@ -1,4 +1,4 @@
-// src/app/api/companion/route.ts
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\companion\route.ts
 
 import prismadb from "@/lib/prismadb";
 import { checkSubscription } from "@/lib/subscription";
@@ -12,20 +12,23 @@ export async function POST(req: NextRequest) {
     const user = await currentUser();
     const { name, characterDescription, categoryId, shortDescription, src } = body;
 
+    // Check if the user is authenticated
     if (!user || !user.id || !user.firstName) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // Check if all required fields are present
     if (!name || !characterDescription || !categoryId || !shortDescription || !src) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
+    // Check if the user has a Pro subscription
     const isPro = await checkSubscription(req);
-
     if (!isPro) {
       return new NextResponse("Pro subscription required", { status: 403 });
     }
 
+    // Create a new companion in the database
     const companion = await prismadb.companion.create({
       data: {
         categoryId,

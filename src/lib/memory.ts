@@ -19,7 +19,7 @@ export class MemoryManager {
 
   private constructor(llm: any) {
     this.prisma = new PrismaClient();
-    const embeddings = new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY });
+    const embeddings = new OpenAIEmbeddings({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY });
 
     // Initialize FAISS vector store and retriever
     const vectorStore = new FaissStore(embeddings, {});
@@ -98,7 +98,7 @@ export class MemoryManager {
 
   public async vectorSearch(recentChatHistory: string[], topK: number = 5): Promise<string[]> {
     const query = recentChatHistory.join(" ");
-    const results = await this.agentMemory.memoryRetriever.getRelevantDocuments(query);
+    const results = await this.agentMemory.memoryRetriever.invoke(query);
     return results.map(doc => doc.pageContent);
   }
 }

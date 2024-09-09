@@ -1,3 +1,5 @@
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(root)\(routes)\companion\[companionId]\components\companion-form.tsx
+
 "use client";
 
 import axios from "axios";
@@ -5,6 +7,7 @@ import * as z from "zod";
 import { Companion, Category } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ImageUpload } from "@/components/image-upload";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";
 import { Separator } from "@components/ui/separator";
 import { Input } from "@components/ui/input";
@@ -25,6 +28,7 @@ const formSchema = z.object({
     physicalAppearance: z.string().min(1, { message: "Physical Appearance is required." }),
     identity: z.string().min(1, { message: "Identity description is required." }),
     interactionStyle: z.string().min(1, { message: "Interaction style is required." }),
+    src: z.string().min(1, { message: "Image is required." }),
     categoryId: z.string().min(1, { message: "Category is required." }),
 });
 
@@ -41,6 +45,7 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
             identity: "",
             interactionStyle: "",
             categoryId: "",
+            src: "", // Add src as a default value
         },
     });
 
@@ -59,6 +64,7 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
                 shortDescription: values.shortDescription, // Include shortDescription in payload
                 characterDescription,
                 categoryId: values.categoryId,
+                src: values.src, // Include src here
             };
 
             if (initialData) {
@@ -71,6 +77,7 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
             router.refresh();
             router.push("/");
         } catch (error) {
+            console.error("Error creating/updating companion:", error); // Add this for detailed error logging
             toast({ variant: "destructive", description: "Something went wrong" });
         }
     };
@@ -84,6 +91,22 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
                         <p className="text-sm text-muted-foreground">General information about your Companion</p>
                         <Separator className="bg-primary/10" />
                     </div>
+                    <FormField
+                        name="src"
+                        render={({ field }) => (
+                            <FormItem className="col-span-2 flex flex-col items-center justify-center space-y-4">
+                                <FormControl>
+                                    <ImageUpload
+                                        disabled={isLoading}
+                                        onChange={field.onChange}
+                                        value={field.value}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2"></div>
                     <FormField
                         name="name"
                         control={form.control}
