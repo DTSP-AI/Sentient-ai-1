@@ -1,10 +1,11 @@
-// /src/app/(chat)/(routes)/chat/[chatId]/page.tsx
+//src\app\(chat)\(routes)\chat\[chatId]\page.tsx
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prismadb from "@/lib/prismadb";
 import { ChatClient } from "./components/client";
-import { Message } from "@prisma/client";
+import { Message, Companion } from "@prisma/client";
+import { ChatMessageProps } from "@/components/chat-message";
 
 interface ChatIdPageProps {
   params: {
@@ -50,17 +51,29 @@ const ChatIdPage = async ({ params }: ChatIdPageProps) => {
     interactionStyle: string;
   };
 
-  const initialMessages = companion.messages.map((message: Message) => ({
+  const initialMessages: ChatMessageProps[] = companion.messages.map((message: Message) => ({
+    id: message.id,
     role: message.role as "user" | "system",
     content: message.content,
+    src: companion.src,
   }));
+
+  const companionWithCharacterDescription: Companion & {
+    messages: Message[];
+    _count: { messages: number };
+    characterDescription: {
+      physicalAppearance: string;
+      identity: string;
+      interactionStyle: string;
+    };
+  } = {
+    ...companion,
+    characterDescription,
+  };
 
   return (
     <ChatClient 
-      companion={{
-        ...companion,
-        characterDescription,
-      }}
+      companion={companionWithCharacterDescription}
       initialMessages={initialMessages}
     />
   );

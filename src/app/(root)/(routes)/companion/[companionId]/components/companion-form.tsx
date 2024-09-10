@@ -127,7 +127,7 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
                             <FormItem>
                                 <FormLabel>Short Description</FormLabel>
                                 <FormControl>
-                                    <Input disabled={isLoading} placeholder="Short description for the UI" {...field} />
+                                    <Input disabled={isLoading} placeholder="Short description that does not dictate personality" {...field} />
                                 </FormControl>
                                 <FormDescription>A brief one-line description of your companion.</FormDescription>
                                 <FormMessage />
