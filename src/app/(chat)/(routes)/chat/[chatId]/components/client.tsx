@@ -22,17 +22,11 @@ interface ChatClientProps {
     };
   };
   initialMessages: ChatMessageProps[];
-  initialResponse: string;
 }
 
-export const ChatClient = ({ companion, initialMessages, initialResponse }: ChatClientProps) => {
+export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
   const router = useRouter();
-
-  // Initialize the messages state with initialMessages and initialResponse
-  const [messages, setMessages] = useState<ChatMessageProps[]>([
-    ...initialMessages,
-    { role: "system", content: initialResponse },
-  ]);
+  const [messages, setMessages] = useState<ChatMessageProps[]>(initialMessages);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -49,9 +43,9 @@ export const ChatClient = ({ companion, initialMessages, initialResponse }: Chat
     setIsLoading(true);
 
     try {
-      const response = await fetch(`/api/chat/${companion.id}`, {  // Use chatId in the API call
+      const response = await fetch(`/api/chat/${companion.id}`, {
         method: "POST",
-        body: JSON.stringify({ prompt: input }),  // Match 'prompt' with server-side handling
+        body: JSON.stringify({ prompt: input }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -63,7 +57,7 @@ export const ChatClient = ({ companion, initialMessages, initialResponse }: Chat
 
       const { systemMessage } = await response.json();
       setMessages((current) => [...current, { role: "system", content: systemMessage }]);
-      setInput(""); // Clear input after sending
+      setInput("");
     } catch (error) {
       console.error("Failed to generate response:", error);
     } finally {
