@@ -3,16 +3,14 @@
     "94afb1e6f663ea8a5304ec9ebe50097021b8d568": {
       "workers": {
         "app/(root)/(routes)/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CSaaS-AI-Companion%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions%5C%5CinvalidateCache.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!",
-        "app/(chat)/(routes)/chat/[chatId]/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CSaaS-AI-Companion%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions%5C%5CinvalidateCache.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!",
-        "app/(root)/(routes)/companion/[companionId]/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CSaaS-AI-Companion%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions%5C%5CinvalidateCache.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!"
+        "app/(chat)/(routes)/chat/[chatId]/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CSaaS-AI-Companion%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions%5C%5CinvalidateCache.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!"
       },
       "layer": {
         "app/(root)/(routes)/page": "action-browser",
-        "app/(chat)/(routes)/chat/[chatId]/page": "action-browser",
-        "app/(root)/(routes)/companion/[companionId]/page": "action-browser"
+        "app/(chat)/(routes)/chat/[chatId]/page": "action-browser"
       }
     }
   },
   "edge": {},
-  "encryptionKey": "k64ehUXPs2TmXwUcP4yjsBmv508k273fj+/NK5GVb6M="
+  "encryptionKey": "xAJKpKzCxgPlATYCCM37/T88q/0xKQByPORPJx7pZSk="
 }
