@@ -757,6 +757,9 @@ video {
 .mt-16 {
   margin-top: 4rem;
 }
+.mt-2 {
+  margin-top: 0.5rem;
+}
 .flex {
   display: flex;
 }
@@ -952,9 +955,6 @@ video {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
-}
-.resize-none {
-  resize: none;
 }
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -1901,10 +1901,6 @@ body,
 }
  
 @media (min-width: 768px) {
-
-  .md\:col-span-1 {
-    grid-column: span 1 / span 1;
-  }
 
   .md\:block {
     display: block;

@@ -1,3 +1,5 @@
+// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(root)\(routes)\companion\[companionId]\page.tsx
+
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
@@ -27,11 +29,11 @@ const CompanionIdPage = async ({ params }: CompanionIdPageProps) => {
     );
   }
 
-  // If not 'new', assume we are editing an existing companion
+  // Fetch the companion if it exists
   const companion = await prismadb.companion.findUnique({
     where: {
       id: params.companionId,
-      userId: userId,
+      userId,  // Already destructured from auth, no need to repeat `userId: userId`
     },
   });
 
@@ -41,6 +43,7 @@ const CompanionIdPage = async ({ params }: CompanionIdPageProps) => {
   }
 
   const categories = await prismadb.category.findMany();
+
   return (
     <div className="h-screen overflow-auto">
       <CompanionForm initialData={companion} categories={categories} />
