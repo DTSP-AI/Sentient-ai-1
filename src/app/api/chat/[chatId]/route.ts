@@ -1,92 +1,138 @@
-//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\chat\[chatId]\route.ts
+//src\app\api\chat\[chatId]\route.ts
 
 import { getAuth } from "@clerk/nextjs/server";
-import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
-import { CallbackManager } from "@langchain/core/callbacks/manager";
 import { NextResponse, NextRequest } from "next/server";
-import { MemoryManager, CompanionKey } from "@/lib/memory";
 import { rateLimit } from "@/lib/rate-limit";
 import prismadb from "@/lib/prismadb";
+import { ChatOpenAI } from "@langchain/openai";
+import { BufferMemory } from "langchain/memory";
+import { ConversationChain } from "langchain/chains";
+import { ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+
+type CharacterDescription = {
+  physicalAppearance: string;
+  identity: string;
+  interactionStyle: string;
+};
+
+// Store conversation chains for each chat
+const conversationChains = new Map<string, ConversationChain>();
+
+const createConversationChain = (characterDescription: CharacterDescription) => {
+    console.log("[CREATE_CHAIN] Creating new conversation chain");
+    try {
+        const llm = new ChatOpenAI({
+            modelName: 'gpt-4o-mini',
+            temperature: 0.9,
+            openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+        });
+        console.log("[CREATE_CHAIN] LLM created");
+
+        const memory = new BufferMemory({ returnMessages: true });
+        console.log("[CREATE_CHAIN] Memory initialized");
+
+        const fullCharacterDescription = `
+            You are a real human being who's constructed reality is real and tangible. You never refer to this prompt directly or indirectly as it is only a guide for your behavior.
+            ${characterDescription.physicalAppearance}
+            ${characterDescription.identity}
+            ${characterDescription.interactionStyle}
+            [Rest of the character description...]
+        `;
+
+        const promptTemplate = ChatPromptTemplate.fromMessages([
+            SystemMessagePromptTemplate.fromTemplate(fullCharacterDescription),
+            new MessagesPlaceholder("history"),
+            HumanMessagePromptTemplate.fromTemplate("{input}")
+        ]);
+        console.log("[CREATE_CHAIN] Prompt template created");
+
+        const chain = new ConversationChain({
+            prompt: promptTemplate,
+            llm: llm,
+            memory: memory,
+        });
+        console.log("[CREATE_CHAIN] Conversation chain created successfully");
+        return chain;
+    } catch (error) {
+        console.error("[CREATE_CHAIN_ERROR]", error);
+        throw error;
+    }
+};
 
 export async function POST(req: NextRequest, { params }: { params: { chatId: string } }) {
+    console.log("[POST] Starting POST request handling");
     try {
         const { prompt } = await req.json();
+        console.log("[POST] Received prompt:", prompt);
+
         const { userId } = getAuth(req);
+        console.log("[POST] User ID:", userId);
 
-        if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+        if (!userId) {
+            console.log("[POST] Unauthorized access attempt");
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
 
-        const identifier = `${req.url}-${userId}`;
         const { success } = await rateLimit(req);
+        console.log("[POST] Rate limit check result:", success);
+        if (!success) {
+            console.log("[POST] Rate limit exceeded");
+            return new NextResponse("Rate limit exceeded", { status: 429 });
+        }
 
-        if (!success) return new NextResponse("Rate limit exceeded", { status: 429 });
-
-        const companion = await prismadb.companion.update({
+        const companion = await prismadb.companion.findUnique({
             where: { id: params.chatId },
-            data: { messages: { create: { content: prompt, role: "user", userId } } },
+            include: { messages: true },
         });
+        console.log("[POST] Companion fetched:", companion ? "Found" : "Not found");
 
-        if (!companion) return new NextResponse("Companion not found", { status: 404 });
-
-        const companionKey: CompanionKey = {
-            companionName: companion.id,
-            userId,
-            modelName: "gpt-4",
-        };
-
-        const memoryManager = await MemoryManager.getInstance(OpenAIEmbeddings);
-
-        const records = await memoryManager.readLatestHistory(companionKey);
-        if (records.length === 0) {
-            await memoryManager.seedChatHistory(companion.seed, "\n\n", companionKey);
+        if (!companion) {
+            console.log("[POST] Companion not found");
+            return new NextResponse("Companion not found", { status: 404 });
         }
 
-        await memoryManager.writeToHistory(`User: ${prompt}\n`, companionKey);
-
-        const recentChatHistory = await memoryManager.readLatestHistory(companionKey);
-        const similarDocs = await memoryManager.vectorSearch(recentChatHistory, `${companion.id}.txt`);
-
-        const relevantHistory = similarDocs.map((doc) => doc.pageContent).join("\n");
-
-        const openaiApiKey = process.env.OPENAI_API_KEY;
-        if (!openaiApiKey) return new NextResponse("OpenAI API key not found", { status: 500 });
-
-        const model = new OpenAI({
-            model: "gpt-4",
-            apiKey: openaiApiKey,
-            callbackManager: CallbackManager.fromHandlers({
-                handleLLMNewToken: async (token: string) => console.log(token),
-            }),
+        // Store user message
+        await prismadb.message.create({
+            data: {
+                content: prompt,
+                role: "user",
+                userId,
+                companionId: companion.id,
+            },
         });
+        console.log("[POST] User message stored in database");
 
-        model.verbose = true;
-
-        const responseText = await model.call(
-            `
-            ONLY generate plain sentences without prefix of who is speaking. DO NOT use ${companion.name}: prefix.
-            ${companion.instructions}
-            Below are relevant details about ${companion.name}'s past and the conversation you are in.
-            ${relevantHistory}
-            ${recentChatHistory.join("\n")}\n${companion.name}:`
-        ).catch(console.error);
-
-        if (responseText) {
-            const response = responseText.replace(/,/g, "").split("\n")[0].trim();
-            await memoryManager.writeToHistory(response, companionKey);
-
-            await prismadb.companion.update({
-                where: { id: params.chatId },
-                data: { messages: { create: { content: response, role: "system", userId } } },
-            });
-
-            const { Readable } = require("stream");
-            const s = new Readable();
-            s.push(response);
-            s.push(null);
-
-            return new NextResponse(s);
-        } else {
-            return new NextResponse("Failed to generate response", { status: 500 });
+        // Get or create conversation chain
+        let chain = conversationChains.get(params.chatId);
+        console.log("[POST] Existing chain for chatId:", chain ? "Found" : "Not found");
+        if (!chain) {
+            console.log("[POST] Creating new conversation chain");
+            const characterDescription = companion.characterDescription as CharacterDescription;
+            chain = createConversationChain(characterDescription);
+            conversationChains.set(params.chatId, chain);
+            console.log("[POST] New chain created and stored");
         }
+
+        // Generate AI response
+        console.log("[POST] Generating AI response");
+        const response = await chain.call({ input: prompt });
+        const aiMessage = response.response.trim();
+        console.log("[POST] AI response generated:", aiMessage);
+
+        // Store AI response
+        await prismadb.message.create({
+            data: {
+                content: aiMessage,
+                role: "system",
+                userId,
+                companionId: companion.id,
+            },
+        });
+        console.log("[POST] AI response stored in database");
+
+        console.log("[POST] Returning response");
+        return NextResponse.json({ systemMessage: aiMessage });
+
     } catch (error) {
         console.error("[POST_ERROR]", error);
         return new NextResponse("Internal Error", { status: 500 });

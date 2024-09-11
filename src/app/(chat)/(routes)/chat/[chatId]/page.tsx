@@ -1,9 +1,11 @@
-//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(chat)\(routes)\chat\[chatId]\page.tsx
+//src\app\(chat)\(routes)\chat\[chatId]\page.tsx
 
-import prismadb from "@lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import prismadb from "@/lib/prismadb";
 import { ChatClient } from "./components/client";
+import { Message, Companion } from "@prisma/client";
+import { ChatMessageProps } from "@/components/chat-message";
 
 interface ChatIdPageProps {
   params: {
@@ -15,11 +17,9 @@ const ChatIdPage = async ({ params }: ChatIdPageProps) => {
   const { userId } = auth();
 
   if (!userId) {
-    // Redirect to sign in if the user is not authenticated
-    return redirect("/sign-in"); // Using server-side redirect instead of a client-side component
+    return redirect("/sign-in");
   }
 
-  // Fetch the companion and its messages from the database
   const companion = await prismadb.companion.findUnique({
     where: {
       id: params.chatId,
@@ -42,12 +42,41 @@ const ChatIdPage = async ({ params }: ChatIdPageProps) => {
   });
 
   if (!companion) {
-    // If no companion is found, redirect to the home page
     return redirect("/");
   }
 
-  // Render the ChatClient component with the companion data
-  return <ChatClient companion={companion} />;
+  const characterDescription = companion.characterDescription as {
+    physicalAppearance: string;
+    identity: string;
+    interactionStyle: string;
+  };
+
+  const initialMessages: ChatMessageProps[] = companion.messages.map((message: Message) => ({
+    id: message.id,
+    role: message.role as "user" | "system",
+    content: message.content,
+    src: companion.src,
+  }));
+
+  const companionWithCharacterDescription: Companion & {
+    messages: Message[];
+    _count: { messages: number };
+    characterDescription: {
+      physicalAppearance: string;
+      identity: string;
+      interactionStyle: string;
+    };
+  } = {
+    ...companion,
+    characterDescription,
+  };
+
+  return (
+    <ChatClient 
+      companion={companionWithCharacterDescription}
+      initialMessages={initialMessages}
+    />
+  );
 };
 
 export default ChatIdPage;
