@@ -2745,6 +2745,16 @@ eval("\n\nif (false) {} else {\n  module.exports = __webpack_require__(/*! ./cjs
 
 /***/ }),
 
+/***/ "(rsc)/./node_modules/next/dist/compiled/server-only/empty.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/next/dist/compiled/server-only/empty.js ***!
+  \**************************************************************/
+/***/ (() => {
+
+
+
+/***/ }),
+
 /***/ "(app-metadata-route)/./node_modules/next/dist/compiled/ua-parser-js/ua-parser.js":
 /*!*******************************************************************!*\
   !*** ./node_modules/next/dist/compiled/ua-parser-js/ua-parser.js ***!

@@ -1,7 +1,6 @@
 {
   "/api/companion/[companionId]/history/route": "app/api/companion/[companionId]/history/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/api/chat/[chatId]/route": "app/api/chat/[chatId]/route.js",
-  "/(root)/(routes)/page": "app/(root)/(routes)/page.js",
-  "/(chat)/(routes)/chat/[chatId]/page": "app/(chat)/(routes)/chat/[chatId]/page.js"
+  "/(chat)/(routes)/chat/[chatId]/page": "app/(chat)/(routes)/chat/[chatId]/page.js",
+  "/(root)/(routes)/page": "app/(root)/(routes)/page.js"
 }
