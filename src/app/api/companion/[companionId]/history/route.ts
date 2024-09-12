@@ -1,10 +1,9 @@
-// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\companion\[companionId]\history\route.ts
+// src/app/api/companion/[companionId]/history/route.ts
 
 import { MemoryManager } from "@/lib/memory";
 import prismadb from "@/lib/prismadb";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { ChatOpenAI } from "@langchain/openai"; // Import LLM
 
 export async function DELETE(
   req: Request,
@@ -30,30 +29,21 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Logging LLM initialization
-    console.log("[DELETE] Initializing LLM...");
-    const llm = new ChatOpenAI({
-      modelName: "gpt-4o-mini",
-      temperature: 0.9,
-      openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-    });
-    console.log("[DELETE] LLM initialized with model:", llm.modelName);
-
     // Logging MemoryManager initialization
     console.log("[DELETE] Getting MemoryManager instance...");
-    const memoryManager = await MemoryManager.getInstance(llm);
+    const memoryManager = await MemoryManager.getInstance();
     console.log("[DELETE] MemoryManager instance obtained.");
 
     // Create companionKey and log it
     const companionKey = {
-      companionName: params.companionId,
+      companionId: params.companionId,
       userId: user.id,
       modelName: "gpt-4o-mini",
     };
     console.log("[DELETE] Companion Key created:", companionKey);
 
     // Logging memory clearing process
-    console.log("[DELETE] Clearing memory history for companion:", companionKey.companionName);
+    console.log("[DELETE] Clearing memory history for companion:", companionKey.companionId);
     await memoryManager.clearHistory(companionKey);
     console.log("[DELETE] Memory history cleared successfully.");
 
