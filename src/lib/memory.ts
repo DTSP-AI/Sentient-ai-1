@@ -18,13 +18,13 @@ export class MemoryManager {
   private agentMemories: Map<string, GenerativeAgentMemory> = new Map();
 
   private constructor() {
-    console.log("MemoryManager constructor called");
+    console.log("[MemoryManager] Constructor called");
     this.prisma = new PrismaClient();
   }
 
   public static async getInstance(): Promise<MemoryManager> {
     if (!MemoryManager.instance) {
-      console.log("Creating new MemoryManager instance");
+      console.log("[MemoryManager] Creating new MemoryManager instance");
       MemoryManager.instance = new MemoryManager();
     }
     return MemoryManager.instance;
@@ -32,20 +32,25 @@ export class MemoryManager {
 
   private async getOrCreateAgentMemory(companionKey: CompanionKey): Promise<GenerativeAgentMemory> {
     const key = `${companionKey.userId}:${companionKey.companionId}`;
+    console.log(`[MemoryManager] Getting or creating agent memory for key: ${key}`);
     if (!this.agentMemories.has(key)) {
-      console.log(`Creating new GenerativeAgentMemory for ${key}`);
+      console.log(`[MemoryManager] Creating new GenerativeAgentMemory for ${key}`);
       const llm = new ChatOpenAI({
         modelName: "gpt-4",
         temperature: 0.9,
         openAIApiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
       });
+      console.log(`[MemoryManager] LLM created with model: ${llm.modelName}`);
       const embeddings = new OpenAIEmbeddings({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY });
+      console.log(`[MemoryManager] Embeddings created`);
       const vectorStore = new FaissStore(embeddings, {});
+      console.log(`[MemoryManager] Vector store created`);
       const memoryRetriever = new TimeWeightedVectorStoreRetriever({
         vectorStore,
         otherScoreKeys: ["importance"],
         k: 15,
       });
+      console.log(`[MemoryManager] Memory retriever created with k=15`);
 
       const agentMemory = new GenerativeAgentMemory(
         llm,
@@ -57,15 +62,17 @@ export class MemoryManager {
           maxTokensLimit: 1200,
         }
       );
+      console.log(`[MemoryManager] GenerativeAgentMemory created with reflectionThreshold=8, importanceWeight=0.15`);
       this.agentMemories.set(key, agentMemory);
     }
     return this.agentMemories.get(key)!;
   }
 
   public async addMemory(companionKey: CompanionKey, text: string): Promise<void> {
-    console.log(`Adding memory for companion: ${companionKey.companionId}`);
+    console.log(`[MemoryManager] Adding memory for companion: ${companionKey.companionId}`);
     const agentMemory = await this.getOrCreateAgentMemory(companionKey);
     await agentMemory.addMemory(text, new Date());
+    console.log(`[MemoryManager] Memory added to GenerativeAgentMemory`);
     
     // Also store in Prisma for backup and easier querying
     await this.prisma.message.create({
@@ -76,17 +83,19 @@ export class MemoryManager {
         role: 'user', // Assuming this is a user message, adjust if needed
       },
     });
+    console.log(`[MemoryManager] Memory stored in Prisma database`);
   }
 
   public async getRelevantMemories(companionKey: CompanionKey, query: string): Promise<string[]> {
-    console.log(`Retrieving relevant memories for companion: ${companionKey.companionId}`);
+    console.log(`[MemoryManager] Retrieving relevant memories for companion: ${companionKey.companionId}`);
     const agentMemory = await this.getOrCreateAgentMemory(companionKey);
     const relevantMemories = await agentMemory.memoryRetriever.getRelevantDocuments(query);
+    console.log(`[MemoryManager] Retrieved ${relevantMemories.length} relevant memories`);
     return relevantMemories.map(mem => mem.pageContent);
   }
 
   public async readLatestHistory(companionKey: CompanionKey): Promise<string[]> {
-    console.log(`Reading latest history for companion: ${companionKey.companionId}`);
+    console.log(`[MemoryManager] Reading latest history for companion: ${companionKey.companionId}`);
     try {
       const messages = await this.prisma.message.findMany({
         where: {
@@ -98,41 +107,48 @@ export class MemoryManager {
         },
         take: 30,
       });
+      console.log(`[MemoryManager] Retrieved ${messages.length} messages from database`);
       return messages.map(msg => msg.content);
     } catch (error) {
-      console.error("Error retrieving latest history:", error);
+      console.error("[MemoryManager] Error retrieving latest history:", error);
       return [];
     }
   }
 
   public async seedChatHistory(seed: string, delimiter: string, companionKey: CompanionKey): Promise<void> {
-    console.log(`Seeding chat history for companion: ${companionKey.companionId}`);
+    console.log(`[MemoryManager] Seeding chat history for companion: ${companionKey.companionId}`);
     const messages = seed.split(delimiter);
+    console.log(`[MemoryManager] Seeding ${messages.length} messages`);
     for (const message of messages) {
       await this.addMemory(companionKey, message);
     }
+    console.log(`[MemoryManager] Chat history seeding completed`);
   }
 
   public async clearHistory(companionKey: CompanionKey): Promise<void> {
-    console.log(`Clearing history for companion: ${companionKey.companionId}`);
+    console.log(`[MemoryManager] Clearing history for companion: ${companionKey.companionId}`);
     if (!companionKey.userId) {
-      console.error("Companion key set incorrectly");
+      console.error("[MemoryManager] Companion key set incorrectly");
       return;
     }
 
     try {
-      await this.prisma.message.deleteMany({
+      const deleteResult = await this.prisma.message.deleteMany({
         where: {
           userId: companionKey.userId,
           companionId: companionKey.companionId,
         },
       });
-      // Also clear the vector store for this companion
+      console.log(`[MemoryManager] Deleted ${deleteResult.count} messages from database`);
+      
+      // Clear the vector store for this companion
       const key = `${companionKey.userId}:${companionKey.companionId}`;
       this.agentMemories.delete(key);
-      console.log("Chat history cleared successfully");
+      console.log(`[MemoryManager] Cleared vector store for key: ${key}`);
+      
+      console.log("[MemoryManager] Chat history cleared successfully");
     } catch (error) {
-      console.error("Error clearing chat history:", error);
+      console.error("[MemoryManager] Error clearing chat history:", error);
     }
   }
 }
