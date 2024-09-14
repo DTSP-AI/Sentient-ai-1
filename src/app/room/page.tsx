@@ -12,7 +12,6 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Track } from "livekit-client";
-import { Chat } from "@livekit/components-react";
 import { useEffect, useState } from "react";
 
 export default function Page() {
