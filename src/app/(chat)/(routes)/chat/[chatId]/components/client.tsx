@@ -12,7 +12,7 @@ import { Companion, Message } from "@prisma/client";
 
 interface ChatClientProps {
   companion: Companion & {
-    messages: Message[];
+    messages: Message[]; // Removed the unused initialMessages prop
     _count: {
       messages: number;
     };
@@ -22,24 +22,49 @@ interface ChatClientProps {
       interactionStyle: string;
     };
   };
-  initialMessages: ChatMessageProps[];
 }
 
 export const ChatClient = ({ companion }: ChatClientProps) => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatMessageProps[]>(
-    companion.messages.map((message) => ({
-      id: message.id,
-      role: message.role as "system" | "user",
-      content: message.content,
-      src: companion.src,
-    }))
-  );
+  const [messages, setMessages] = useState<ChatMessageProps[]>([]);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
   // Ref for the input field
   const inputRef = useRef<HTMLInputElement | null>(null);
+  
+  // Scroll ref to keep the chat scrolled to the bottom
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch the latest messages on component mount
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(`/api/chat/${companion.id}/messages`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch messages.");
+        }
+        const data = await response.json();
+        const fetchedMessages: ChatMessageProps[] = data.map((msg: Message) => ({
+          id: msg.id,
+          role: msg.role as "system" | "user",
+          content: msg.content,
+          src: companion.src,
+        }));
+        setMessages(fetchedMessages);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+    fetchMessages();
+  }, [companion.id]);
+
+  // Scroll to the bottom when messages change
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   // Focus the input when the AI response is received
   useEffect(() => {
@@ -88,7 +113,6 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
       console.error("Failed to generate response:", error);
     } finally {
       setIsLoading(false);
-      router.refresh();
     }
   };
 
@@ -100,6 +124,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
         isLoading={isLoading}
         companion={companion}
       />
+      <div ref={scrollRef} /> {/* Scroll to the newest message */}
       <ChatForm
         isLoading={isLoading}
         input={input}

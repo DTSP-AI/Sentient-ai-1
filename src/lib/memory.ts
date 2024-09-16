@@ -20,7 +20,7 @@ export class MemoryManager {
   private bufferMemory: BufferMemory;
 
   // Accept maxTokensLimit in the constructor
-  private constructor(llm: any, maxTokensLimit: number) { 
+  private constructor(llm: any, maxTokensLimit: number) {
     console.log("[MemoryManager] Constructor called with LLM:", JSON.stringify(llm));
 
     try {
@@ -139,32 +139,33 @@ export class MemoryManager {
     }
   }
 
-  public async readLatestHistory(companionKey: CompanionKey): Promise<string[]> {
+  public async readLatestHistory(companionKey: CompanionKey, offset: number = 0, limit: number = 15): Promise<string[]> {
     console.log("[MemoryManager] readLatestHistory called with CompanionKey:", JSON.stringify(companionKey));
-    
+
     if (!companionKey.userId) {
       console.error("[MemoryManager] Error: Companion key set incorrectly, userId is missing");
       throw new Error("Invalid CompanionKey: userId is required");
     }
 
     try {
-      console.log("[MemoryManager] Fetching latest messages from Prisma");
+      console.log("[MemoryManager] Fetching paginated messages from Prisma");
       const messages = await this.prisma.message.findMany({
         where: {
           userId: companionKey.userId,
           companionId: companionKey.companionName,
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: 'desc', // Fetch in reverse chronological order
         },
-        take: 30,
+        skip: offset,
+        take: limit,
       });
 
-      console.log("[MemoryManager] Latest history retrieved successfully, count:", messages.length);
-      return messages.map(msg => msg.content);
+      console.log("[MemoryManager] Paginated history retrieved successfully, count:", messages.length);
+      return messages.reverse().map(msg => msg.content); // Reverse to maintain chronological order
     } catch (error) {
-      console.error("[MemoryManager] Error retrieving latest history:", error);
-      throw new Error("Failed to read latest history");
+      console.error("[MemoryManager] Error retrieving paginated history:", error);
+      throw new Error("Failed to read paginated history");
     }
   }
 
