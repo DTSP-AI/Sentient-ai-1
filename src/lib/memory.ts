@@ -19,7 +19,8 @@ export class MemoryManager {
   private agentMemory: GenerativeAgentMemory;
   private bufferMemory: BufferMemory;
 
-  private constructor(llm: any) {
+  // Accept maxTokensLimit in the constructor
+  private constructor(llm: any, maxTokensLimit: number) { 
     console.log("[MemoryManager] Constructor called with LLM:", JSON.stringify(llm));
 
     try {
@@ -56,22 +57,22 @@ export class MemoryManager {
           reflectionThreshold: 8,
           importanceWeight: 0.15,
           verbose: true,
-          maxTokensLimit: 1800,
+          maxTokensLimit: maxTokensLimit, // Set maxTokensLimit
         }
       );
-      console.log("[MemoryManager] GenerativeAgentMemory initialized successfully");
+      console.log("[MemoryManager] GenerativeAgentMemory initialized successfully with maxTokensLimit:", maxTokensLimit);
     } catch (error) {
       console.error("[MemoryManager] Error initializing memory components:", error);
       throw new Error("Failed to initialize memory components");
     }
   }
 
-  public static async getInstance(llm: any): Promise<MemoryManager> {
+  public static async getInstance(llm: any, maxTokensLimit: number): Promise<MemoryManager> {
     console.log("[MemoryManager] getInstance called with LLM:", JSON.stringify(llm));
     if (!MemoryManager.instance) {
       console.log("[MemoryManager] Creating new MemoryManager instance");
       try {
-        MemoryManager.instance = new MemoryManager(llm);
+        MemoryManager.instance = new MemoryManager(llm, maxTokensLimit);
         console.log("[MemoryManager] New instance created successfully");
       } catch (error) {
         console.error("[MemoryManager] Error creating new instance:", error);
@@ -219,8 +220,7 @@ export class MemoryManager {
       // Load BufferMemory context
       const bufferContext = await this.bufferMemory.loadMemoryVariables(inputs);
 
-      // Fetch relevant persistent 
-      
+      // Fetch relevant persistent memories
       const persistentMemories = await this.vectorSearch(bufferContext.history);
 
       // Combine both memories into the response
