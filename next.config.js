@@ -1,7 +1,14 @@
+// C:\AI_src\Companion_UI\SaaS-AI-Companion\next.config.js
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["res.cloudinary.com"]
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -10,9 +17,12 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-      }
+      };
     }
-    return config
+    return config;
+  },
+  experimental: {
+    serverComponentsExternalPackages: ["faiss-node"],
   },
 };
 

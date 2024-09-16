@@ -49,6 +49,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { companionI
     }
 
     console.log("Updating companion with ID:", params.companionId);
+    console.log("Character Description:", body.characterDescription); // New log for characterDescription
     const companion = await prismadb.companion.update({
       where: { id: params.companionId },
       data: {

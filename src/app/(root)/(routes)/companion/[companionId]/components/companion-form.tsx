@@ -39,7 +39,15 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: initialData || {
+        defaultValues: initialData ? {
+            name: initialData.name,
+            shortDescription: initialData.shortDescription || "",
+            physicalAppearance: (initialData.characterDescription as any)?.physicalAppearance || "",
+            identity: (initialData.characterDescription as any)?.identity || "",
+            interactionStyle: (initialData.characterDescription as any)?.interactionStyle || "",
+            categoryId: initialData.categoryId,
+            src: initialData.src,
+        } : {
             name: "",
             shortDescription: "",
             physicalAppearance: "",
@@ -52,15 +60,25 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
 
     const isLoading = form.formState.isSubmitting;
 
-    // UseEffect to reset form when initialData changes
     useEffect(() => {
         if (initialData) {
-            form.reset(initialData);
+            console.log("Setting form values with initialData:", initialData);
+            form.reset({
+                name: initialData.name,
+                shortDescription: initialData.shortDescription || "",
+                physicalAppearance: (initialData.characterDescription as any)?.physicalAppearance || "",
+                identity: (initialData.characterDescription as any)?.identity || "",
+                interactionStyle: (initialData.characterDescription as any)?.interactionStyle || "",
+                categoryId: initialData.categoryId,
+                src: initialData.src,
+            });
         }
     }, [initialData, form]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
+            console.log("Form submitted with values:", values);
+
             const characterDescription = {
                 physicalAppearance: values.physicalAppearance,
                 identity: values.identity,
@@ -75,12 +93,17 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
                 src: values.src,
             };
 
+            console.log("Payload prepared:", payload);
+
             if (initialData) {
+                console.log("Updating existing companion:", initialData.id);
                 await axios.patch(`/api/companion/${initialData.id}`, payload);
             } else {
+                console.log("Creating new companion");
                 await axios.post("/api/companion", payload);
             }
 
+            console.log("Companion saved successfully");
             toast({ description: "Success." });
             router.refresh();
             router.push("/");
