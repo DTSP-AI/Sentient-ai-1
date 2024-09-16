@@ -12,7 +12,7 @@ import { Companion, Message } from "@prisma/client";
 
 interface ChatClientProps {
   companion: Companion & {
-    messages: Message[]; // Removed the unused initialMessages prop
+    messages: Message[];
     _count: {
       messages: number;
     };
@@ -30,10 +30,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
-  // Ref for the input field
   const inputRef = useRef<HTMLInputElement | null>(null);
-  
-  // Scroll ref to keep the chat scrolled to the bottom
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fetch the latest messages on component mount
@@ -52,12 +49,19 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
           src: companion.src,
         }));
         setMessages(fetchedMessages);
+        // Store fetched messages in localStorage
+        localStorage.setItem(`chat_${companion.id}`, JSON.stringify(fetchedMessages));
       } catch (error) {
         console.error("Error fetching messages:", error);
+        // If fetch fails, try to load from localStorage
+        const storedMessages = localStorage.getItem(`chat_${companion.id}`);
+        if (storedMessages) {
+          setMessages(JSON.parse(storedMessages));
+        }
       }
     };
     fetchMessages();
-  }, [companion.id]);
+  }, [companion.id, companion.src]);
 
   // Scroll to the bottom when messages change
   useEffect(() => {
@@ -83,7 +87,9 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
       content: input,
       src: companion.src,
     };
-    setMessages((current) => [...current, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    localStorage.setItem(`chat_${companion.id}`, JSON.stringify(updatedMessages));
 
     setIsLoading(true);
 
@@ -107,7 +113,9 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
         content: systemMessage,
         src: companion.src,
       };
-      setMessages((current) => [...current, aiMessage]);
+      const newMessages = [...updatedMessages, aiMessage];
+      setMessages(newMessages);
+      localStorage.setItem(`chat_${companion.id}`, JSON.stringify(newMessages));
       setInput("");
     } catch (error) {
       console.error("Failed to generate response:", error);
@@ -124,11 +132,11 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
         isLoading={isLoading}
         companion={companion}
       />
-      <div ref={scrollRef} /> {/* Scroll to the newest message */}
+      <div ref={scrollRef} />
       <ChatForm
         isLoading={isLoading}
         input={input}
-        inputRef={inputRef} // Pass the ref to ChatForm
+        inputRef={inputRef}
         handleInputChange={(e) => setInput(e.target.value)}
         onSubmit={handleSubmit}
       />
