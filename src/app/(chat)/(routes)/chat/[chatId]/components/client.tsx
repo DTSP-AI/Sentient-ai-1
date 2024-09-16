@@ -1,8 +1,8 @@
-//src\app\(chat)\(routes)\chat\[chatId]\components\client.tsx
+// src\app\(chat)\(routes)\chat\[chatId]\components\client.tsx
 
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useRef, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChatHeader } from "@/components/chat-header";
 import { ChatForm } from "@/components/chat-form";
@@ -37,6 +37,16 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
   );
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Ref for the input field
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // Focus the input when the AI response is received
+  useEffect(() => {
+    if (!isLoading && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,6 +103,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
       <ChatForm
         isLoading={isLoading}
         input={input}
+        inputRef={inputRef} // Pass the ref to ChatForm
         handleInputChange={(e) => setInput(e.target.value)}
         onSubmit={handleSubmit}
       />
