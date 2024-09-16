@@ -1,5 +1,7 @@
 {
   "/api/chat/[chatId]/route": "app/api/chat/[chatId]/route.js",
+  "/api/companion/[companionId]/route": "app/api/companion/[companionId]/route.js",
   "/(chat)/(routes)/chat/[chatId]/page": "app/(chat)/(routes)/chat/[chatId]/page.js",
-  "/(root)/(routes)/page": "app/(root)/(routes)/page.js"
+  "/(root)/(routes)/page": "app/(root)/(routes)/page.js",
+  "/(root)/(routes)/companion/[companionId]/page": "app/(root)/(routes)/companion/[companionId]/page.js"
 }
