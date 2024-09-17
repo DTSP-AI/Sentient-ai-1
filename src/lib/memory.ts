@@ -120,8 +120,14 @@ export class MemoryManager {
 
     try {
       console.log("[MemoryManager] Adding memory to agentMemory");
-      await this.agentMemory.addMemory(text, new Date(), { userId: companionKey.userId, companionId: companionKey.companionName });
+      const result = await this.agentMemory.addMemory(text, new Date(), { userId: companionKey.userId, companionId: companionKey.companionName });
       console.log("[MemoryManager] Memory added to agentMemory successfully");
+      
+      // Log reflection if it occurred
+      if (result && result.reflection) {
+        console.log("🤔 [REFLECTION] Agent is reflecting on past experiences");
+        console.log("💡 [REFLECTION] Reflection result:", result.reflection);
+      }
       
       console.log("[MemoryManager] Storing message in Prisma");
       await this.prisma.message.create({
