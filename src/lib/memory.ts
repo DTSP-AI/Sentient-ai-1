@@ -5,6 +5,7 @@ import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { GenerativeAgentMemory } from "langchain/experimental/generative_agents";
 import { TimeWeightedVectorStoreRetriever } from "langchain/retrievers/time_weighted";
+import { BufferMemory } from 'langchain/memory';
 
 export type CompanionKey = {
   companionName: string;
@@ -16,59 +17,119 @@ export class MemoryManager {
   private static instance: MemoryManager;
   private prisma: PrismaClient;
   private agentMemory: GenerativeAgentMemory;
+  private bufferMemory: BufferMemory;
 
-  private constructor(llm: any) {
-    console.log("MemoryManager constructor called with LLM:", llm);
+  // Accept maxTokensLimit in the constructor
+  private constructor(llm: any, maxTokensLimit: number) {
+    console.log("[MemoryManager] Constructor called with LLM:", JSON.stringify(llm));
 
-    this.prisma = new PrismaClient();
-    const embeddings = new OpenAIEmbeddings({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY });
+    try {
+      this.prisma = new PrismaClient();
+      console.log("[MemoryManager] PrismaClient initialized successfully");
+    } catch (error) {
+      console.error("[MemoryManager] Error initializing PrismaClient:", error);
+      throw new Error("Failed to initialize PrismaClient");
+    }
 
-    // Initialize FAISS vector store and retriever
-    const vectorStore = new FaissStore(embeddings, {});
-    const memoryRetriever = new TimeWeightedVectorStoreRetriever({
-      vectorStore: vectorStore,
-      otherScoreKeys: ["importance"],
-      k: 15,
-    });
+    try {
+      // Initialize BufferMemory
+      this.bufferMemory = new BufferMemory({ returnMessages: true });
+      console.log("[MemoryManager] BufferMemory initialized successfully");
 
-    // Use GenerativeAgentMemory to handle memory management
-    this.agentMemory = new GenerativeAgentMemory(
-      llm,
-      memoryRetriever,
-      {
-        reflectionThreshold: 8,
-        importanceWeight: 0.15,
-        verbose: true,
-        maxTokensLimit: 1200,
-      }
-    );
-    console.log("GenerativeAgentMemory successfully initialized");
+      // Initialize GenerativeAgentMemory
+      const embeddings = new OpenAIEmbeddings({ apiKey: process.env.OPENAI_API_KEY });
+      console.log("[MemoryManager] OpenAIEmbeddings initialized successfully");
+
+      const vectorStore = new FaissStore(embeddings, {});
+      console.log("[MemoryManager] FaissStore initialized successfully");
+
+      const memoryRetriever = new TimeWeightedVectorStoreRetriever({
+        vectorStore: vectorStore,
+        otherScoreKeys: ["importance"],
+        k: 15,
+      });
+      console.log("[MemoryManager] TimeWeightedVectorStoreRetriever initialized successfully");
+
+      this.agentMemory = new GenerativeAgentMemory(
+        llm,
+        memoryRetriever,
+        {
+          reflectionThreshold: 8,
+          importanceWeight: 0.15,
+          verbose: true,
+          maxTokensLimit: maxTokensLimit, // Set maxTokensLimit
+        }
+      );
+      console.log("[MemoryManager] GenerativeAgentMemory initialized successfully with maxTokensLimit:", maxTokensLimit);
+    } catch (error) {
+      console.error("[MemoryManager] Error initializing memory components:", error);
+      throw new Error("Failed to initialize memory components");
+    }
   }
 
-  public static async getInstance(llm: any): Promise<MemoryManager> {
-    console.log("Getting MemoryManager instance with LLM:", llm);
+  public static async getInstance(llm: any, maxTokensLimit: number): Promise<MemoryManager> {
+    console.log("[MemoryManager] getInstance called with LLM:", JSON.stringify(llm));
     if (!MemoryManager.instance) {
-      console.log("MemoryManager instance is undefined, creating a new one...");
-      MemoryManager.instance = new MemoryManager(llm);
+      console.log("[MemoryManager] Creating new MemoryManager instance");
+      try {
+        MemoryManager.instance = new MemoryManager(llm, maxTokensLimit);
+        console.log("[MemoryManager] New instance created successfully");
+      } catch (error) {
+        console.error("[MemoryManager] Error creating new instance:", error);
+        throw new Error("Failed to create MemoryManager instance");
+      }
     } else {
-      console.log("Returning existing MemoryManager instance.");
+      console.log("[MemoryManager] Returning existing MemoryManager instance");
     }
     return MemoryManager.instance;
   }
 
+  // Method to access bufferMemory
+  public getBufferMemory(): BufferMemory {
+    return this.bufferMemory;
+  }
+
+  public async saveContext(inputs: any, outputs: any, companionKey: CompanionKey): Promise<void> {
+    console.log("[MemoryManager] saveContext called");
+
+    const userMessage = inputs.input;
+    const aiMessage = outputs.response;
+
+    try {
+      // Save to BufferMemory
+      await this.bufferMemory.saveContext(inputs, outputs);
+      console.log("[MemoryManager] Context saved to BufferMemory");
+
+      // Save to GenerativeAgentMemory
+      await this.writeToHistory(userMessage, companionKey);
+      await this.writeToHistory(aiMessage, companionKey);
+      console.log("[MemoryManager] Context saved to GenerativeAgentMemory");
+    } catch (error) {
+      console.error("[MemoryManager] Error saving context:", error);
+      throw new Error("Failed to save context");
+    }
+  }
+
   public async writeToHistory(text: string, companionKey: CompanionKey): Promise<void> {
-    console.log("writeToHistory called with CompanionKey:", companionKey);
+    console.log("[MemoryManager] writeToHistory called with text:", text, "and CompanionKey:", JSON.stringify(companionKey));
     
     if (!companionKey.userId) {
-      console.error("Companion key set incorrectly");
-      return;
+      console.error("[MemoryManager] Error: Companion key set incorrectly, userId is missing");
+      throw new Error("Invalid CompanionKey: userId is required");
     }
 
     try {
-      console.log("Adding memory to agentMemory...");
-      await this.agentMemory.addMemory(text, new Date(), { userId: companionKey.userId, companionId: companionKey.companionName });
+      console.log("[MemoryManager] Adding memory to agentMemory");
+      const result = await this.agentMemory.addMemory(text, new Date(), { userId: companionKey.userId, companionId: companionKey.companionName });
+      console.log("[MemoryManager] Memory added to agentMemory successfully");
       
-      console.log("Storing message in Prisma...");
+      // Log reflection if it occurred
+      if (result && result.reflection) {
+        console.log("🤔 [REFLECTION] Agent is reflecting on past experiences");
+        console.log("💡 [REFLECTION] Reflection result:", result.reflection);
+      }
+      
+      console.log("[MemoryManager] Storing message in Prisma");
       await this.prisma.message.create({
         data: {
           content: text,
@@ -77,78 +138,106 @@ export class MemoryManager {
           role: 'user',
         },
       });
-      console.log("Message stored successfully in Prisma");
+      console.log("[MemoryManager] Message stored successfully in Prisma");
     } catch (error) {
-      console.error("Error writing to history:", error);
+      console.error("[MemoryManager] Error writing to history:", error);
+      throw new Error("Failed to write to history");
     }
   }
 
-  public async readLatestHistory(companionKey: CompanionKey): Promise<string[]> {
-    console.log("readLatestHistory called with CompanionKey:", companionKey);
-    
+  public async readLatestHistory(companionKey: CompanionKey, offset: number = 0, limit: number = 15): Promise<string[]> {
+    console.log("[MemoryManager] readLatestHistory called with CompanionKey:", JSON.stringify(companionKey));
+
     if (!companionKey.userId) {
-      console.error("Companion key set incorrectly");
-      return [];
+      console.error("[MemoryManager] Error: Companion key set incorrectly, userId is missing");
+      throw new Error("Invalid CompanionKey: userId is required");
     }
 
     try {
+      console.log("[MemoryManager] Fetching paginated messages from Prisma");
       const messages = await this.prisma.message.findMany({
         where: {
           userId: companionKey.userId,
           companionId: companionKey.companionName,
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: 'desc', // Fetch in reverse chronological order
         },
-        take: 30,
+        skip: offset,
+        take: limit,
       });
 
-      console.log("Latest history retrieved successfully");
-      return messages.map(msg => msg.content);
+      console.log("[MemoryManager] Paginated history retrieved successfully, count:", messages.length);
+      return messages.reverse().map(msg => msg.content); // Reverse to maintain chronological order
     } catch (error) {
-      console.error("Error retrieving latest history:", error);
-      return [];
-    }
-  }
-
-  public async seedChatHistory(seed: string, delimiter: string, companionKey: CompanionKey): Promise<void> {
-    console.log("seedChatHistory called with seed and delimiter:", seed, delimiter);
-    
-    const messages = seed.split(delimiter);
-    for (const message of messages) {
-      await this.writeToHistory(message, companionKey);
+      console.error("[MemoryManager] Error retrieving paginated history:", error);
+      throw new Error("Failed to read paginated history");
     }
   }
 
   public async vectorSearch(recentChatHistory: string[], topK: number = 5): Promise<string[]> {
-    console.log("vectorSearch called with recentChatHistory:", recentChatHistory);
+    console.log("[MemoryManager] vectorSearch called with recentChatHistory length:", recentChatHistory.length, "topK:", topK);
     
     const query = recentChatHistory.join(" ");
-    const results = await this.agentMemory.memoryRetriever.invoke(query);
-    console.log("Vector search results:", results);
-    return results.map(doc => doc.pageContent);
+    console.log("[MemoryManager] Constructed query:", query.substring(0, 100) + "...");
+
+    try {
+      console.log("[MemoryManager] Invoking memoryRetriever");
+      const results = await this.agentMemory.memoryRetriever.invoke(query);
+      console.log("[MemoryManager] Vector search completed, number of results:", results.length);
+
+      const pageContents = results.map(doc => doc.pageContent);
+      console.log("[MemoryManager] Extracted page contents, first result:", pageContents[0]?.substring(0, 100) + "...");
+
+      return pageContents;
+    } catch (error) {
+      console.error("[MemoryManager] Error during vector search:", error);
+      throw new Error("Failed to perform vector search");
+    }
   }
 
   public async clearHistory(companionKey: CompanionKey): Promise<void> {
-    console.log("clearHistory called with CompanionKey:", companionKey);
+    console.log("[MemoryManager] clearHistory called with CompanionKey:", JSON.stringify(companionKey));
     
     if (!companionKey || typeof companionKey.userId === "undefined") {
-      console.error("Companion key set incorrectly");
-      return;
+      console.error("[MemoryManager] Error: Invalid companion key");
+      throw new Error("Invalid CompanionKey: userId is required");
     }
 
     try {
-      console.log("Deleting messages from Prisma for companionKey:", companionKey);
-      // Delete all messages for the given companion and userId
-      await this.prisma.message.deleteMany({
+      console.log("[MemoryManager] Deleting messages from Prisma for companionKey:", JSON.stringify(companionKey));
+      const deleteResult = await this.prisma.message.deleteMany({
         where: {
           userId: companionKey.userId,
           companionId: companionKey.companionName,
         },
       });
-      console.log("Chat history cleared successfully");
+      console.log("[MemoryManager] Chat history cleared successfully, deleted count:", deleteResult.count);
     } catch (error) {
-      console.error("Error clearing chat history:", error);
+      console.error("[MemoryManager] Error clearing chat history:", error);
+      throw new Error("Failed to clear chat history");
+    }
+  }
+
+  // Retrieve combined memory context for generating responses
+  public async loadMemoryVariables(inputs: any): Promise<any> {
+    console.log("[MemoryManager] loadMemoryVariables called");
+
+    try {
+      // Load BufferMemory context
+      const bufferContext = await this.bufferMemory.loadMemoryVariables(inputs);
+
+      // Fetch relevant persistent memories
+      const persistentMemories = await this.vectorSearch(bufferContext.history);
+
+      // Combine both memories into the response
+      return {
+        ...bufferContext,
+        persistentMemories,
+      };
+    } catch (error) {
+      console.error("[MemoryManager] Error loading memory variables:", error);
+      throw new Error("Failed to load memory variables");
     }
   }
 }

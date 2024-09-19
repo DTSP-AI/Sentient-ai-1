@@ -7,6 +7,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
+// Function to validate the required fields in the request body
 const validateFields = (body: any) => {
   const { name, characterDescription, categoryId, shortDescription, src } = body;
   if (!name || !characterDescription || !categoryId || !shortDescription || !src) {
@@ -16,6 +17,7 @@ const validateFields = (body: any) => {
   return null;
 };
 
+// PATCH method to update the companion details
 export async function PATCH(req: NextRequest, { params }: { params: { companionId: string } }) {
   try {
     console.log("PATCH request received");
@@ -71,6 +73,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { companionI
   }
 }
 
+// DELETE method to remove the companion and its associated messages
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { companionId: string } }

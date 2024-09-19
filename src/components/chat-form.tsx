@@ -1,4 +1,4 @@
-//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\chat-form.tsx
+// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\chat-form.tsx
 
 "use client";
 
@@ -9,6 +9,7 @@ import { SendHorizonal } from "lucide-react";
 
 interface ChatFormProps {
   input: string;
+  inputRef: React.RefObject<HTMLInputElement>; // Accept the inputRef
   handleInputChange: (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
@@ -16,6 +17,7 @@ interface ChatFormProps {
 
 export const ChatForm = ({
   input,
+  inputRef, // Use the inputRef
   handleInputChange,
   onSubmit,
   isLoading
@@ -28,6 +30,7 @@ export const ChatForm = ({
         onChange={handleInputChange}
         placeholder="Type a message"
         className="rounded-lg bg-primary/10"
+        ref={inputRef} // Pass the ref to Input
       />
       <Button type="submit" disabled={isLoading} variant="ghost">
         <SendHorizonal className="h-6 w-6" />

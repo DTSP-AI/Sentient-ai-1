@@ -4,7 +4,7 @@ import { getAuth } from "@clerk/nextjs/server";
 import prismadb from "./prismadb";
 import type { NextRequest } from "next/server";
 
-const MAX_FREE_COUNTS = parseInt(process.env.MAX_FREE_COUNTS || "100", 10);
+const MAX_FREE_COUNTS = parseInt(process.env.MAX_FREE_COUNTS || "1000", 10);
 
 export const increaseApiLimit = async (req: NextRequest): Promise<void> => {
   const { userId } = getAuth(req);

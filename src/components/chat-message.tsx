@@ -1,4 +1,4 @@
-//src\components\chat-message.tsx
+// src\components\chat-message.tsx
 
 "use client";
 
@@ -12,16 +12,16 @@ import { useTheme } from "next-themes";
 import { BeatLoader } from "react-spinners";
 
 export interface ChatMessageProps {
-  id: string;
+  id?: string;
   role: "system" | "user";
   content?: string;
   isLoading?: boolean;
-  src: string;
+  src?: string; // Make src optional as in the old repo
 }
 
 export const ChatMessage = ({
   role,
-  content,
+  content = "", // Provide a default empty string
   isLoading,
   src,
 }: ChatMessageProps) => {
@@ -40,6 +40,13 @@ export const ChatMessage = ({
     });
   };
 
+  // Convert newlines to paragraphs for display
+  const formattedContent = content.split("\n").map((line, index) => (
+    <p key={index} className="mb-2">
+      {line}
+    </p>
+  ));
+
   return (
     <div className={cn(
       "group flex items-start gap-x-3 py-4 w-full",
@@ -50,7 +57,7 @@ export const ChatMessage = ({
         {isLoading ? (
           <BeatLoader size={5} color={theme === "light" ? "black" : "white"} />
         ) : (
-          content
+          <div>{formattedContent}</div> // Render formatted content as paragraphs
         )}
       </div>
       {role === "user" && <UserAvatar />}

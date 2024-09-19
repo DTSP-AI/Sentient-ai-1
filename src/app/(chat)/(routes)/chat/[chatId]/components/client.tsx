@@ -1,8 +1,8 @@
-//src\app\(chat)\(routes)\chat\[chatId]\components\client.tsx
+// src\app\(chat)\(routes)\chat\[chatId]\components\client.tsx
 
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useRef, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChatHeader } from "@/components/chat-header";
 import { ChatForm } from "@/components/chat-form";
@@ -22,21 +22,60 @@ interface ChatClientProps {
       interactionStyle: string;
     };
   };
-  initialMessages: ChatMessageProps[];
 }
 
 export const ChatClient = ({ companion }: ChatClientProps) => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatMessageProps[]>(
-    companion.messages.map((message) => ({
-      id: message.id,
-      role: message.role as "system" | "user",
-      content: message.content,
-      src: companion.src,
-    }))
-  );
+  const [messages, setMessages] = useState<ChatMessageProps[]>([]);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch the latest messages on component mount
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(`/api/chat/${companion.id}/messages`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch messages.");
+        }
+        const data = await response.json();
+        const fetchedMessages: ChatMessageProps[] = data.map((msg: Message) => ({
+          id: msg.id,
+          role: msg.role as "system" | "user",
+          content: msg.content,
+          src: companion.src,
+        }));
+        setMessages(fetchedMessages);
+        // Store fetched messages in localStorage
+        localStorage.setItem(`chat_${companion.id}`, JSON.stringify(fetchedMessages));
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+        // If fetch fails, try to load from localStorage
+        const storedMessages = localStorage.getItem(`chat_${companion.id}`);
+        if (storedMessages) {
+          setMessages(JSON.parse(storedMessages));
+        }
+      }
+    };
+    fetchMessages();
+  }, [companion.id, companion.src]);
+
+  // Scroll to the bottom when messages change
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  // Focus the input when the AI response is received
+  useEffect(() => {
+    if (!isLoading && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +87,9 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
       content: input,
       src: companion.src,
     };
-    setMessages((current) => [...current, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    localStorage.setItem(`chat_${companion.id}`, JSON.stringify(updatedMessages));
 
     setIsLoading(true);
 
@@ -72,27 +113,36 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
         content: systemMessage,
         src: companion.src,
       };
-      setMessages((current) => [...current, aiMessage]);
+      const newMessages = [...updatedMessages, aiMessage];
+      setMessages(newMessages);
+      localStorage.setItem(`chat_${companion.id}`, JSON.stringify(newMessages));
       setInput("");
     } catch (error) {
       console.error("Failed to generate response:", error);
     } finally {
       setIsLoading(false);
-      router.refresh();
     }
+  };
+
+  // Function to clear messages on the client side
+  const onMessagesCleared = () => {
+    setMessages([]); // Clear the state
+    localStorage.removeItem(`chat_${companion.id}`); // Clear local storage
   };
 
   return (
     <div className="flex flex-col h-full p-4 space-y-2">
-      <ChatHeader companion={companion} />
-      <ChatMessages 
+      <ChatHeader companion={companion} onMessagesCleared={onMessagesCleared} />
+      <ChatMessages
         messages={messages}
         isLoading={isLoading}
         companion={companion}
       />
+      <div ref={scrollRef} />
       <ChatForm
         isLoading={isLoading}
         input={input}
+        inputRef={inputRef}
         handleInputChange={(e) => setInput(e.target.value)}
         onSubmit={handleSubmit}
       />
