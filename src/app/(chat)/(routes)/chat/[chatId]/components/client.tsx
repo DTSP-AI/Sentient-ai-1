@@ -124,9 +124,15 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
     }
   };
 
+  // Function to clear messages on the client side
+  const onMessagesCleared = () => {
+    setMessages([]); // Clear the state
+    localStorage.removeItem(`chat_${companion.id}`); // Clear local storage
+  };
+
   return (
     <div className="flex flex-col h-full p-4 space-y-2">
-      <ChatHeader companion={companion} />
+      <ChatHeader companion={companion} onMessagesCleared={onMessagesCleared} />
       <ChatMessages
         messages={messages}
         isLoading={isLoading}
