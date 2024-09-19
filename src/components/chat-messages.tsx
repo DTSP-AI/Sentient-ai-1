@@ -19,26 +19,31 @@ export const ChatMessages = ({
 }: ChatMessagesProps) => {
   const scrollRef = useRef<ElementRef<"div">>(null);
 
-  const [fakeLoading, setFakeLoading] = useState(
-    messages.length === 0 ? true : false,
-  );
+  // State to control the fake loading animation
+  const [fakeLoading, setFakeLoading] = useState(messages.length === 0);
 
+  // Use effect to handle fake loading when the component mounts
   useEffect(() => {
     const timeout = setTimeout(() => {
       setFakeLoading(false);
     }, 1000);
 
+    // Clean up the timeout to prevent memory leaks
     return () => {
       clearTimeout(timeout);
     };
   }, []);
 
+  // Scroll to the bottom of the chat messages when new messages are added
   useEffect(() => {
-    scrollRef?.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   return (
     <div className="flex-1 overflow-y-auto pr-4">
+      {/* Introductory message from the companion */}
       <ChatMessage
         id="intro-message"
         role="system"
@@ -46,6 +51,7 @@ export const ChatMessages = ({
         src={companion.src}
         isLoading={fakeLoading}
       />
+      {/* Map through and render each chat message */}
       {messages.map((message) => (
         <ChatMessage
           key={message.id}
@@ -55,6 +61,7 @@ export const ChatMessages = ({
           src={companion.src}
         />
       ))}
+      {/* Show a loading message if the system is loading */}
       {isLoading && (
         <ChatMessage
           id="loading-message"
@@ -64,6 +71,7 @@ export const ChatMessages = ({
           isLoading={true}
         />
       )}
+      {/* Reference div for scrolling to the bottom */}
       <div ref={scrollRef} />
     </div>
   );

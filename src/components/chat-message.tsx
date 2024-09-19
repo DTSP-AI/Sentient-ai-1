@@ -12,11 +12,11 @@ import { useTheme } from "next-themes";
 import { BeatLoader } from "react-spinners";
 
 export interface ChatMessageProps {
-  id: string;
+  id?: string;
   role: "system" | "user";
   content?: string;
   isLoading?: boolean;
-  src: string;
+  src?: string; // Make src optional as in the old repo
 }
 
 export const ChatMessage = ({
