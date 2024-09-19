@@ -1,4 +1,4 @@
-// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\chat-header.tsx
+//src\components\chat-header.tsx
 
 "use client";
 
@@ -28,27 +28,23 @@ interface ChatHeaderProps {
   companion: Companion & {
     messages: Message[];
   };
+  onMessagesCleared: () => void;
 }
 
-export const ChatHeader = ({ companion }: ChatHeaderProps) => {
+export const ChatHeader = ({ companion, onMessagesCleared }: ChatHeaderProps) => {
   const router = useRouter();
   const { user } = useUser();
   const { toast } = useToast();
 
+  // Function to handle deleting a companion
   const onDelete = async () => {
     try {
       console.log(`Attempting to delete companion with id: ${companion.id}`);
-      const response = await axios.delete(`/api/companion/${companion.id}`);
-      console.log("Delete response:", response);
-  
-      if (response.status === 200) {
-        toast({ description: "Companion deleted successfully." });
-        console.log("Companion deleted successfully");
-        router.refresh();
-        router.push("/");
-      } else {
-        throw new Error(`Unexpected response status: ${response.status}`);
-      }
+      await axios.delete(`/api/companion/${companion.id}`);
+      toast({ description: "Companion deleted successfully." });
+      console.log("Companion deleted successfully");
+      router.refresh(); // Refresh the page
+      router.push("/"); // Navigate back to the home page
     } catch (error) {
       console.error("Error deleting companion:", error);
       toast({
@@ -58,19 +54,19 @@ export const ChatHeader = ({ companion }: ChatHeaderProps) => {
     }
   };
 
+  // Function to handle clearing message history
   const onClearMessageHistory = async () => {
     try {
       console.log(`Clearing message history for companion with id: ${companion.id}`);
       await axios.delete(`/api/companion/${companion.id}/history`);
-
-      toast({ description: "Message history cleared." });
+      toast({ description: "Message history cleared successfully." });
       console.log("Message history cleared successfully");
-
-      router.refresh();
+      onMessagesCleared(); // Call the function to clear messages on the client side
+      router.refresh(); // Optionally refresh to reflect changes in UI
     } catch (error) {
       console.error("Error clearing message history:", error);
       toast({
-        description: "Something went wrong.",
+        description: "Failed to clear message history. Please try again.",
         variant: "destructive",
       });
     }
@@ -84,7 +80,7 @@ export const ChatHeader = ({ companion }: ChatHeaderProps) => {
           variant="ghost"
           onClick={() => {
             console.log("Navigating back");
-            router.back();
+            router.back(); // Navigate to the previous page
           }}
         >
           <ChevronLeft className="h-8 w-8" />
@@ -111,7 +107,7 @@ export const ChatHeader = ({ companion }: ChatHeaderProps) => {
           <DropdownMenuItem
             onClick={() => {
               console.log("Clear Message History button clicked");
-              onClearMessageHistory();
+              onClearMessageHistory(); // Trigger clearing of message history
             }}
           >
             <History className="mr-2 h-4 w-4" />
@@ -122,17 +118,16 @@ export const ChatHeader = ({ companion }: ChatHeaderProps) => {
               <DropdownMenuItem
                 onClick={() => {
                   console.log("Edit button clicked, navigating to edit companion");
-                  router.push(`/companion/${companion.id}`);
+                  router.push(`/companion/${companion.id}`); // Navigate to companion edit page
                 }}
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-
               <DropdownMenuItem
                 onClick={() => {
                   console.log("Delete button clicked");
-                  onDelete();
+                  onDelete(); // Trigger deletion of the companion
                 }}
               >
                 <Trash className="mr-2 h-4 w-4" />

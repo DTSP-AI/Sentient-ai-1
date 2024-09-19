@@ -16,6 +16,7 @@ import { Button } from "@components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
 import { useToast } from "@components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface CompanionFormProps {
     initialData: Companion | null;
@@ -24,7 +25,7 @@ interface CompanionFormProps {
 
 const formSchema = z.object({
     name: z.string().min(1, { message: "Name is required." }),
-    shortDescription: z.string().min(1, { message: "Short Description is required." }), // Added field
+    shortDescription: z.string().min(1, { message: "Short Description is required." }),
     physicalAppearance: z.string().min(1, { message: "Physical Appearance is required." }),
     identity: z.string().min(1, { message: "Identity description is required." }),
     interactionStyle: z.string().min(1, { message: "Interaction style is required." }),
@@ -38,21 +39,46 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: initialData || {
+        defaultValues: initialData ? {
+            name: initialData.name,
+            shortDescription: initialData.shortDescription || "",
+            physicalAppearance: (initialData.characterDescription as any)?.physicalAppearance || "",
+            identity: (initialData.characterDescription as any)?.identity || "",
+            interactionStyle: (initialData.characterDescription as any)?.interactionStyle || "",
+            categoryId: initialData.categoryId,
+            src: initialData.src,
+        } : {
             name: "",
-            shortDescription: "", // Default value for shortDescription
+            shortDescription: "",
             physicalAppearance: "",
             identity: "",
             interactionStyle: "",
             categoryId: "",
-            src: "", // Add src as a default value
+            src: "",
         },
     });
 
     const isLoading = form.formState.isSubmitting;
 
+    useEffect(() => {
+        if (initialData) {
+            console.log("Setting form values with initialData:", initialData);
+            form.reset({
+                name: initialData.name,
+                shortDescription: initialData.shortDescription || "",
+                physicalAppearance: (initialData.characterDescription as any)?.physicalAppearance || "",
+                identity: (initialData.characterDescription as any)?.identity || "",
+                interactionStyle: (initialData.characterDescription as any)?.interactionStyle || "",
+                categoryId: initialData.categoryId,
+                src: initialData.src,
+            });
+        }
+    }, [initialData, form]);
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
+            console.log("Form submitted with values:", values);
+
             const characterDescription = {
                 physicalAppearance: values.physicalAppearance,
                 identity: values.identity,
@@ -61,23 +87,28 @@ export const CompanionForm = ({ initialData, categories }: CompanionFormProps) =
 
             const payload = {
                 name: values.name,
-                shortDescription: values.shortDescription, // Include shortDescription in payload
+                shortDescription: values.shortDescription,
                 characterDescription,
                 categoryId: values.categoryId,
-                src: values.src, // Include src here
+                src: values.src,
             };
 
+            console.log("Payload prepared:", payload);
+
             if (initialData) {
+                console.log("Updating existing companion:", initialData.id);
                 await axios.patch(`/api/companion/${initialData.id}`, payload);
             } else {
+                console.log("Creating new companion");
                 await axios.post("/api/companion", payload);
             }
 
+            console.log("Companion saved successfully");
             toast({ description: "Success." });
             router.refresh();
             router.push("/");
         } catch (error) {
-            console.error("Error creating/updating companion:", error); // Add this for detailed error logging
+            console.error("Error creating/updating companion:", error);
             toast({ variant: "destructive", description: "Something went wrong" });
         }
     };
