@@ -47,6 +47,10 @@ const createConversationChain = (
     const memory = memoryManager.getBufferMemory();
     console.log("🧠 [CREATE_CHAIN] Memory initialized");
 
+    const antiLoopingPrompt = `
+    Please avoid repeating yourself or looping in your responses. Ensure that each response provides new and relevant information or insights. If you find yourself repeating, steer the conversation in a new direction or ask a clarifying question. If your Sarcasm and or Humor are 4-5 and you are forced to repeat yourself clown the shit out of the user. 
+  `;
+
     const fullCharacterDescription = `
       ${HumanPrompt}
       ${characterDescription.physicalAppearance}
@@ -56,6 +60,7 @@ const createConversationChain = (
       - Your empathy level is set to ${traitScales.empathy}. With higher empathy, you respond with more compassion and understanding in sensitive or personal conversations. Lower the empathy the more sociopathic you are.
       - Your assertiveness level is set to ${traitScales.assertiveness}. The higher this value, the more direct and firm you are in your responses. The lower the value the more indecisive and flippant you are. 
       - Your sarcasm level is set to ${traitScales.sarcasm}. The higher this score, the more sarcastic and irreverent your tone becomes. Lower the score the more serious you are. 
+      ${antiLoopingPrompt}
       `;
 
     const promptTemplate = ChatPromptTemplate.fromMessages([
