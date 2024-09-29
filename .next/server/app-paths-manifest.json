@@ -1,5 +1,8 @@
 {
-  "/(chat)/(routes)/chat/[chatId]/page": "app/(chat)/(routes)/chat/[chatId]/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/companion/[companionId]/route": "app/api/companion/[companionId]/route.js",
+  "/api/chat/[chatId]/route": "app/api/chat/[chatId]/route.js",
   "/(root)/(routes)/page": "app/(root)/(routes)/page.js",
+  "/(chat)/(routes)/chat/[chatId]/page": "app/(chat)/(routes)/chat/[chatId]/page.js",
   "/(root)/(routes)/companion/[companionId]/page": "app/(root)/(routes)/companion/[companionId]/page.js"
 }
