@@ -7,7 +7,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-// Function to validate the required fields in the request body
+// 📝 Function to validate the required fields in the request body
 const validateFields = (body: any) => {
   const {
     name,
@@ -26,7 +26,7 @@ const validateFields = (body: any) => {
     sexualModeration,
   } = body;
 
-  // Check for undefined or null values instead of falsy values
+  // 🔍 Check for undefined or null values instead of falsy values
   if (
     name === undefined ||
     characterDescription === undefined ||
@@ -53,7 +53,7 @@ const validateFields = (body: any) => {
     interactionStyle,
   } = characterDescription;
 
-  // Check for undefined or null values in character description fields
+  // 🔍 Check for undefined or null values in character description fields
   if (
     physicalAppearance === undefined ||
     identity === undefined ||
@@ -66,7 +66,7 @@ const validateFields = (body: any) => {
   return null;
 };
 
-// PATCH method to update the companion details
+// 🛠️ PATCH method to update the companion details
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { companionId: string } }
@@ -77,7 +77,7 @@ export async function PATCH(
     console.log("📨 Request body parsed:", body);
 
     const user = await currentUser();
-    console.log("👤 Current user:", user?.id);
+    console.log("👤 Current user ID:", user?.id);
 
     if (!params?.companionId) {
       console.log("❗️ Companion ID is required");
@@ -157,6 +157,53 @@ export async function PATCH(
     return NextResponse.json(companion);
   } catch (error) {
     console.error("❌ [COMPANION_PATCH]", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
+
+// 🗑️ DELETE method to remove the companion and its associated messages
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { companionId: string } }
+) {
+  try {
+    console.log("🗑️ DELETE request received for companion:", params?.companionId);
+
+    const { userId } = auth();
+    console.log("🔑 Auth userId:", userId);
+
+    if (!userId) {
+      console.log("❌ Unauthorized: No userId");
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    if (!params?.companionId) {
+      console.log("❗️ Companion ID is required but not provided.");
+      return new NextResponse("Companion ID is required", { status: 400 });
+    }
+
+    // 🗑️ Delete companion
+    console.log("🗑️ Deleting companion with ID:", params.companionId);
+    const companion = await prismadb.companion.delete({
+      where: {
+        id: params.companionId,
+        userId,
+      },
+    });
+    console.log("✅ Companion deleted successfully:", companion);
+
+    // 🗑️ Delete associated messages
+    console.log("🗑️ Deleting associated messages for companion:", params.companionId);
+    await prismadb.message.deleteMany({
+      where: {
+        companionId: params.companionId,
+      },
+    });
+    console.log("✅ Associated messages deleted successfully");
+
+    return NextResponse.json(companion);
+  } catch (error) {
+    console.error("❌ [COMPANION_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
