@@ -2,7 +2,8 @@
 
 import { Navbar } from "@components/navbar";
 import { Sidebar } from "@components/sidebar";
-import { VerticalCompanionMenu } from "@components/vertical-companion-menu"; // 🧑‍💼 Imported Vertical Companion Menu
+import { MobileSidebar } from "@components/mobile-sidebar";
+import { VerticalCompanionMenu } from "@components/vertical-companion-menu";
 import { checkSubscription } from "@lib/subscription";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
@@ -13,40 +14,46 @@ interface ChatLayoutProps {
 }
 
 const ChatLayout = async ({ children }: ChatLayoutProps) => {
-    // Create a NextRequest object from the current headers
     const reqHeaders = headers();
     const host = reqHeaders.get("host") || "";
     const protocol = reqHeaders.get("x-forwarded-proto") || "http";
     const req = new NextRequest(`${protocol}://${host}`);
 
+    console.log("🚀 Checking subscription status...");
     const isPro = await checkSubscription(req);
+    console.log(`📜 Subscription status: ${isPro ? "Pro" : "Basic"}`);
 
-    // Fetch companions data (replace with your actual data fetching logic)
     const companions: (Companion & {
         _count: {
             messages: number;
-        }
-    })[] = []; // Replace this with your data fetching logic
+        };
+    })[] = [];
+    console.log("📦 Fetched companions data:", companions);
 
     return (
         <div className="h-full flex">
-            {/* Navbar */}
+            {/* 🧭 Navbar */}
             <Navbar isPro={isPro} />
 
-            {/* Sidebar for larger screens */}
+            {/* 🗂 Sidebar for larger screens */}
             <div className="hidden md:flex w-20 flex-col fixed inset-y-0">
                 <Sidebar isPro={isPro} />
             </div>
 
-            {/* Vertical Companion Menu for larger screens */}
+            {/* 📱 Mobile Sidebar for smaller screens */}
+            <div className="md:hidden fixed inset-y-0 left-0 z-40"> {/* Fixed positioning to avoid layout push */}
+                <MobileSidebar isPro={isPro} />
+            </div>
+
+            {/* 🧑‍💼 Vertical Companion Menu for larger screens */}
             <div className="hidden md:flex w-48 fixed inset-y-0 left-20">
                 <VerticalCompanionMenu data={companions} />
             </div>
 
-            {/* Main content area */}
-            <main className="flex-1 pt-16 pl-[17rem] h-full"> {/* pl-[17rem] accounts for Sidebar (5rem) + VerticalCompanionMenu (12rem) */}
+            {/* 🖥️ Main content area */}
+            <main className="flex-1 pt-16 md:pl-[17rem] h-full"> {/* Removed padding for small screens */}
                 <div className="h-full w-full">
-                    {children}
+                    {children} {/* 🔥 Render children components */}
                 </div>
             </main>
         </div>

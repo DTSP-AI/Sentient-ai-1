@@ -45,7 +45,7 @@ export const ChatMessages = ({
   }, [messages]); // 📥 Dependency on messages array
 
   return (
-    <div className="flex-1 overflow-y-auto pr-4 h-full w-full"> {/* 🖥️ Container for chat messages with vertical scrolling and full height */}
+    <div className="flex-1 overflow-y-auto px-4 h-full"> {/* 🖥️ Adjusted padding for symmetry */}
       {/* 💬 Introductory message from the companion */}
       <ChatMessage
         id="intro-message" // 🆔 Unique ID for the introductory message
@@ -79,3 +79,4 @@ export const ChatMessages = ({
     </div>
   );
 };
+

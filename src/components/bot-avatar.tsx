@@ -1,4 +1,4 @@
-//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\bot-avatar.tsx
+// Relative Path: /src/components/bot-avatar.tsx
 
 import { Avatar, AvatarImage } from "./ui/avatar";
 
@@ -10,8 +10,8 @@ export const BotAvatar = ({
     src
 }: BotAvatarProps) => {
     return (
-        <Avatar className="h-12 w-12">
+        <Avatar className="h-6 w-6 md:h-10 md:w-10"> {/* Tiny on mobile, larger on desktop */}
             <AvatarImage src={src} />
         </Avatar>
-    )
-}
+    );
+};

@@ -20,16 +20,16 @@ export const ChatForm = ({
   inputRef, // Use the inputRef
   handleInputChange,
   onSubmit,
-  isLoading,
+  isLoading
 }: ChatFormProps) => {
   return (
-    <form onSubmit={onSubmit} className="border-t border-primary/10 py-4 flex items-center gap-x-2 w-full"> {/* Added w-full to take full width */}
+    <form onSubmit={onSubmit} className="border-t border-primary/10 w-full px-2 py-4 md:px-12 flex items-center gap-x-1">
       <Input 
         disabled={isLoading}
         value={input}
         onChange={handleInputChange}
         placeholder="Type a message"
-        className="rounded-lg bg-primary/10 flex-grow" // Added flex-grow to input to make it expand
+        className="rounded-lg bg-primary/10"
         ref={inputRef} // Pass the ref to Input
       />
       <Button type="submit" disabled={isLoading} variant="ghost">

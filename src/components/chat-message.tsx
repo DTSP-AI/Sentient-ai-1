@@ -33,14 +33,12 @@ export const ChatMessage = ({
   // 📋 Function to handle copying message content to clipboard
   const onCopy = () => {
     if (!content) {
-      // ❌ No content to copy
-      console.log("❌ Attempted to copy empty content.");
+      console.log("❌ Attempted to copy empty content."); // 📝 Log when attempting to copy an empty content
       return;
     }
 
     navigator.clipboard.writeText(content); // 📋 Write content to clipboard
-    // 📢 Notify user of successful copy
-    console.log("📋 Message copied to clipboard:", content);
+    console.log("📋 Message copied to clipboard:", content); // 📝 Log successful copy action
     toast({
       description: "Message copied to clipboard.",
       duration: 3000,
@@ -50,8 +48,7 @@ export const ChatMessage = ({
   // 📋 Function to handle copying code snippets to clipboard
   const onCopyCode = (code: string) => {
     navigator.clipboard.writeText(code); // 📋 Write code to clipboard
-    // 📢 Notify user of successful code copy
-    console.log("📋 Code snippet copied to clipboard:", code);
+    console.log("📋 Code snippet copied to clipboard:", code); // 📝 Log successful code copy action
     toast({
       description: "Code copied to clipboard.",
       duration: 3000,
@@ -84,18 +81,17 @@ export const ChatMessage = ({
       parts.push(
         <div
           key={index}
-          className="flex flex-col items-start w-full px-0.5" // 📱 Adjusted to items-start and minimal padding
+          className="flex md:flex-col items-start w-full px-0.5" // 📱 Adjusted to items-start and minimal padding
         >
           {/* 🏷️ Code Block Header */}
-          <div className="w-full flex justify-between items-center bg-gray-800 bg-opacity-75 text-gray-200 px-0.5 py-1 rounded-t-lg"> {/* 🔽 Updated padding and border radius */}
-            <span className="text-sm font-medium ml-2">{lang || "javascript"}</span> {/* 📄 Language Label moved right by 8px */}
+          <div className="w-full flex justify-between items-center bg-gray-800 bg-opacity-75 text-gray-200 px-0.5 py-1 rounded-t-lg">
+            <span className="text-xl font-medium ml-2">{lang || "javascript"}</span> {/* 📄 Language Label */}
             <Button
               onClick={() => onCopyCode(code)} // 📂 Handle copy code action on click
-              variant="ghost" // 🎨 Button variant
-              size="icon" // 📏 Button size
+              variant="ghost"
+              size="icon"
             >
               <Copy className="w-4 h-4" /> {/* 📋 Copy icon */}
-              {/* 📋 Copy button tooltip */}
             </Button>
           </div>
           {/* 🖥️ Syntax Highlighted Code Block */}
@@ -105,7 +101,7 @@ export const ChatMessage = ({
             showLineNumbers // 🔢 Show line numbers in code block
             customStyle={{
               backgroundColor: "#000000", // ⚫ Black background for code blocks
-              borderRadius: "0 0 0.5rem 0.5rem", // 🔲 Rounded bottom corners to 0.5rem (8px), top corners remain 0px
+              borderRadius: "0 0 0.5rem 0.5rem", // 🔲 Rounded bottom corners
               padding: "16px", // 🖼️ Padding inside the code block
               marginTop: "0", // 📏 Remove top margin to align with header
               marginBottom: "8px", // 📏 Bottom margin
@@ -120,8 +116,7 @@ export const ChatMessage = ({
       );
 
       lastIndex = index + fullMatch.length; // 🔢 Update last processed index
-      // 🔍 Log detection and rendering of a code block
-      console.log("🔍 Detected and rendered a code block.");
+      console.log("🔍 Detected and rendered a code block."); // 📝 Log code block rendering
     }
 
     // 📝 Add any remaining text after the last code block as a paragraph
@@ -138,26 +133,25 @@ export const ChatMessage = ({
   };
 
   return (
-    <div
+  <div
       className={cn(
-        "group flex items-start gap-x-3 py-4 w-full", // ⚙️ Base styling for message container
-        role === "user" && "justify-end" // 🧑‍💻 Align user messages to the end (right)
+        "group flex items-start gap-x-2 py-2 w-full", // 📏 Maintain full width on all screen sizes
+        role === "user" ? "md:justify-end" : "justify-start" // 👤 Apply justify-end only on medium screens and larger for user messages
       )}
     >
       {role !== "user" && src && <BotAvatar src={src} />} {/* 👤 Bot avatar */}
-      <div className="rounded-md bg-primary/10 px-4 py-2 max-w-md text-sm"> {/* 📏 Container for message content */}
+     <div className="rounded-md bg-primary/10 px-4 py-4 w-full max-w-full sm:max-w-sm md:max-w-md text-sm md:text-base">
+
         {/* 🌀 Display loader if the message is loading */}
         {isLoading ? (
           <>
             <BeatLoader size={5} color={theme === "light" ? "black" : "white"} /> {/* 🌀 Loading spinner */}
-            {/* 📡 Loading state visually hidden for accessibility */}
-            <span className="sr-only">Loading...</span>
+            <span className="sr-only">Loading...</span> {/* 📡 Loading state visually hidden for accessibility */}
           </>
         ) : (
           <div>
             {renderContent()} {/* 📝 Render the formatted content */}
-            {/* 🖨️ Log successful content rendering */}
-            <p className="text-xs text-gray-500 mt-1">🖨️ Content rendered successfully.</p>
+            <p className="text-xs text-gray-500 mt-1">🖨️ Content rendered successfully.</p> {/* 🖨️ Log successful content rendering */}
           </div>
         )}
       </div>
@@ -170,7 +164,6 @@ export const ChatMessage = ({
           variant="ghost" // 🎨 Button variant
         >
           <Copy className="w-4 h-4" /> {/* 📋 Copy icon */}
-          {/* 📋 Copy button tooltip */}
         </Button>
       )}
     </div>
