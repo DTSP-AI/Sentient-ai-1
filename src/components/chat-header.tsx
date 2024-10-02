@@ -1,4 +1,4 @@
-//src\components\chat-header.tsx
+// Relative Path: /src/components/chat-header.tsx
 
 "use client";
 
@@ -88,7 +88,7 @@ export const ChatHeader = ({ companion, onMessagesCleared }: ChatHeaderProps) =>
         <BotAvatar src={companion.src} />
         <div className="flex flex-col gap-y-1">
           <div className="flex items-center gap-x-2">
-            <p className="font-bold">{companion.name}</p>
+            <p className="text-xl font-bold">{companion.name}</p> {/* Increased font size */}
             <div className="flex items-center text-xs text-muted-foreground">
               <MessageSquare className="mr-1 h-3 w-3" />
               {companion.messages.length}

@@ -30,7 +30,7 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
   const [messages, setMessages] = useState<ChatMessageProps[]>(initialMessages);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
   const inputRef = useRef<HTMLInputElement | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -140,14 +140,16 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 space-y-2">
+    <div className="flex flex-col h-full w-full space-y-2"> {/* Ensured full width */}
       <ChatHeader companion={companion} onMessagesCleared={onMessagesCleared} />
-      <ChatMessages
-        messages={messages}
-        isLoading={isLoading}
-        companion={companion}
-      />
-      <div ref={scrollRef} />
+      <div className="flex-1 overflow-y-auto"> {/* Adjusted to stretch the chat area */}
+        <ChatMessages
+          messages={messages}
+          isLoading={isLoading}
+          companion={companion}
+        />
+        <div ref={scrollRef} />
+      </div>
       <ChatForm
         isLoading={isLoading}
         input={input}

@@ -25,12 +25,18 @@
     "/(chat)/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
+      "static/css/app/(chat)/layout.css",
       "static/chunks/app/(chat)/layout.js"
     ],
     "/(root)/(routes)/companion/[companionId]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(root)/(routes)/companion/[companionId]/page.js"
+    ],
+    "/(root)/(routes)/settings/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(root)/(routes)/settings/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
