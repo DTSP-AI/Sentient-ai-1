@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"; // 🔘 Reusable button compone
 import { useToast } from "@/components/ui/use-toast"; // 🛠️ Hook for toast notifications
 import { UserAvatar } from "@/components/user-avatar"; // 👤 User avatar component
 import { cn } from "@/lib/utils"; // 🧩 Utility for conditional classNames
-import { Copy } from "lucide-react"; // 📦 Icon for copy functionality
+import { Pencil, Copy } from "lucide-react"; // 📦 Icons for edit and copy functionalities
 import { useTheme } from "next-themes"; // 🎨 Hook to access current theme
 import { BeatLoader } from "react-spinners"; // 🌀 Loader component for loading states
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"; // 🖥️ Syntax highlighter for code blocks
@@ -43,6 +43,12 @@ export const ChatMessage = ({
       description: "Message copied to clipboard.",
       duration: 3000,
     });
+  };
+
+  // ✏️ Function to handle editing the message
+  const onEdit = () => {
+    console.log("✏️ Edit button clicked for message:", content); // 📝 Log edit action
+    // Add your editing logic here
   };
 
   // 📋 Function to handle copying code snippets to clipboard
@@ -133,15 +139,24 @@ export const ChatMessage = ({
   };
 
   return (
-  <div
+    <div
       className={cn(
         "group flex items-start gap-x-2 py-2 w-full", // 📏 Maintain full width on all screen sizes
-        role === "user" ? "md:justify-end" : "justify-start" // 👤 Apply justify-end only on medium screens and larger for user messages
+        role === "user" ? "justify-end" : "justify-start" // 👤 Adjust alignment for user and bot messages
       )}
     >
+      {role === "user" && (
+        <Button
+          onClick={onEdit} // ✏️ Handle edit action on click
+          className="opacity-0 group-hover:opacity-100 transition" // 👀 Show button on hover
+          size="icon" // 📏 Button size
+          variant="ghost" // 🎨 Button variant
+        >
+          <Pencil className="w-4 h-4" /> {/* ✏️ Edit icon */}
+        </Button>
+      )}
       {role !== "user" && src && <BotAvatar src={src} />} {/* 👤 Bot avatar */}
-     <div className="rounded-md bg-primary/10 px-4 py-4 w-full max-w-full sm:max-w-sm md:max-w-md text-sm md:text-base">
-
+      <div className="rounded-md bg-primary/10 px-4 py-4 w-full max-w-full sm:max-w-md md:max-w-md text-sm md:text-base">
         {/* 🌀 Display loader if the message is loading */}
         {isLoading ? (
           <>

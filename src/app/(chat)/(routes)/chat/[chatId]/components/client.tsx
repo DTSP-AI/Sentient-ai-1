@@ -1,4 +1,4 @@
-// Path: src/app/(chat)/routes/chat/[chatId]/components/client.tsx
+// Relative Path: /src/app/(chat)/routes/chat/[chatId]/components/client.tsx
 
 "use client";
 

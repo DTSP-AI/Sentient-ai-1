@@ -17,7 +17,8 @@ export const ChatMessages = ({
   isLoading,
   companion,
 }: ChatMessagesProps) => {
-  const scrollRef = useRef<ElementRef<"div">>(null); // 📍 Reference to the scroll container
+  const scrollContainerRef = useRef<HTMLDivElement>(null); // 📍 Reference to the scrollable container
+  const scrollRef = useRef<HTMLDivElement>(null); // 📍 Reference to the scroll-to-bottom element
 
   // 🌀 State to control the fake loading animation
   const [fakeLoading, setFakeLoading] = useState(messages.length === 0);
@@ -38,14 +39,17 @@ export const ChatMessages = ({
 
   // 🔄 useEffect to scroll to the bottom when new messages are added
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" }); // 📜 Smooth scroll to bottom
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight, // 📏 Scroll to the bottom of the container
+        behavior: "smooth",
+      });
       console.log("📍 Scrolled to the bottom of chat messages.");
     }
   }, [messages]); // 📥 Dependency on messages array
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 h-full"> {/* 🖥️ Adjusted padding for symmetry */}
+    <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 h-full"> {/* 🖥️ Scrollable container */}
       {/* 💬 Introductory message from the companion */}
       <ChatMessage
         id="intro-message" // 🆔 Unique ID for the introductory message
@@ -79,4 +83,3 @@ export const ChatMessages = ({
     </div>
   );
 };
-

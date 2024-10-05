@@ -32,11 +32,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(root)/(routes)/companion/[companionId]/page.js"
-    ],
-    "/(root)/(routes)/settings/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(root)/(routes)/settings/page.js"
     ]
   }
 }
