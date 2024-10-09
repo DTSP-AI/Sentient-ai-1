@@ -44,7 +44,7 @@ export const ChatHeader = ({ companion, onMessagesCleared }: ChatHeaderProps) =>
       toast({ description: "Companion deleted successfully." });
       console.log("Companion deleted successfully");
       router.refresh(); // Refresh the page
-      router.push("/"); // Navigate back to the home page
+      router.push("/"); // Navigate back to the companions page
     } catch (error) {
       console.error("Error deleting companion:", error);
       toast({
@@ -79,8 +79,8 @@ export const ChatHeader = ({ companion, onMessagesCleared }: ChatHeaderProps) =>
           size="icon"
           variant="ghost"
           onClick={() => {
-            console.log("Navigating back");
-            router.back(); // Navigate to the previous page
+            console.log("Navigating to companions page");
+            router.push("/"); // Always navigate to the companions page
           }}
         >
           <ChevronLeft className="h-8 w-8" />

@@ -32,19 +32,18 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false); // ⏳ Loading state
 
   const inputRef = useRef<HTMLInputElement | null>(null); // 🔗 Reference to the input element
-  const scrollRef = useRef<HTMLDivElement>(null); // 📍 Reference to the scroll container
 
   // 🌀 Fetch the latest messages on component mount
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        console.log("🚀 Fetching messages for chat:", companion.id);
+        console.log("🚀 Fetching messages for chat:", companion.id); // 📝 Log API call
         const response = await fetch(`/api/chat/${companion.id}/messages`);
         if (!response.ok) {
-          throw new Error("Failed to fetch messages.");
+          throw new Error("❌ Failed to fetch messages."); // 🛑 Log API error
         }
         const data = await response.json();
-        console.log("📨 Fetched messages:", data);
+        console.log("📨 Fetched messages:", data); // 📝 Log fetched data
 
         const fetchedMessages: ChatMessageProps[] = data.map((msg: Message) => ({
           id: msg.id,
@@ -55,35 +54,27 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
         setMessages(fetchedMessages);
         // 🗄️ Store fetched messages in localStorage
         localStorage.setItem(`chat_${companion.id}`, JSON.stringify(fetchedMessages));
-        console.log("🗄️ Messages stored in localStorage.");
+        console.log("🗄️ Messages stored in localStorage."); // 📝 Log storage action
       } catch (error) {
-        console.error("❌ Error fetching messages:", error);
+        console.error("❌ Error fetching messages:", error); // 🛑 Log fetch error
         // 📂 If fetch fails, try to load from localStorage
         const storedMessages = localStorage.getItem(`chat_${companion.id}`);
         if (storedMessages) {
-          console.log("🗄️ Loaded messages from localStorage.");
+          console.log("🗄️ Loaded messages from localStorage."); // 📝 Log loading from storage
           setMessages(JSON.parse(storedMessages));
         } else {
-          console.log("🆘 No messages found in localStorage.");
+          console.log("🆘 No messages found in localStorage."); // 📝 Log absence of stored messages
         }
       }
     };
     fetchMessages();
   }, [companion.id, companion.src]);
 
-  // 🔄 Scroll to the bottom when messages change
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" }); // 📜 Smooth scroll to bottom
-      console.log("📍 Automatically scrolled to the bottom of chat messages.");
-    }
-  }, [messages]);
-
   // 🎯 Focus the input when the AI response is received
   useEffect(() => {
     if (!isLoading && inputRef.current) {
       inputRef.current.focus(); // 🎯 Focus the input field
-      console.log("🎯 Input field focused.");
+      console.log("🎯 Input field focused."); // 📝 Log focus action
     }
   }, [isLoading]);
 
@@ -91,7 +82,7 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) {
-      console.log("⚠️ Empty input. Message not sent.");
+      console.log("⚠️ Empty input. Message not sent."); // 📝 Log empty input attempt
       return;
     }
 
@@ -104,10 +95,10 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     localStorage.setItem(`chat_${companion.id}`, JSON.stringify(updatedMessages));
-    console.log("⌨️ User message sent:", userMessage);
+    console.log("⌨️ User message sent:", userMessage); // 📝 Log sent message
 
     setIsLoading(true);
-    console.log("⏳ Awaiting AI response...");
+    console.log("⏳ Awaiting AI response..."); // 📝 Log awaiting response
 
     try {
       const response = await fetch(`/api/chat/${companion.id}`, {
@@ -119,11 +110,11 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch AI response.");
+        throw new Error("❌ Failed to fetch AI response."); // 🛑 Log API error
       }
 
       const { systemMessage } = await response.json();
-      console.log("🤖 AI response received:", systemMessage);
+      console.log("🤖 AI response received:", systemMessage); // 📝 Log AI response
 
       const aiMessage: ChatMessageProps = {
         id: (Date.now() + 1).toString(),
@@ -134,15 +125,15 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
       const newMessages = [...updatedMessages, aiMessage];
       setMessages(newMessages);
       localStorage.setItem(`chat_${companion.id}`, JSON.stringify(newMessages));
-      console.log("✅ AI message appended to chat.");
+      console.log("✅ AI message appended to chat."); // 📝 Log AI message addition
       setInput("");
-      console.log("📝 Input field cleared.");
+      console.log("📝 Input field cleared."); // 📝 Log input field clearance
     } catch (error) {
-      console.error("❌ Failed to generate response:", error);
+      console.error("❌ Failed to generate response:", error); // 🛑 Log response generation error
       // 🔄 Optionally, notify the user about the error
     } finally {
       setIsLoading(false);
-      console.log("🔄 Loading state updated to false.");
+      console.log("🔄 Loading state updated to false."); // 📝 Log loading state update
     }
   };
 
@@ -150,19 +141,19 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
   const onMessagesCleared = () => {
     setMessages([]); // 🧹 Clear the state
     localStorage.removeItem(`chat_${companion.id}`); // 🗑️ Clear local storage
-    console.log("🗑️ Cleared all messages from state and localStorage.");
+    console.log("🗑️ Cleared all messages from state and localStorage."); // 📝 Log clearance action
   };
 
   return (
-    <div className="flex flex-col h-full p-4 space-y-2">
+    <div className="flex flex-col h-full p-2 md:px-20 space-y-2 scrollbar-hide scrollbar-hover"> {/* 🌀 Applied global scrollbar classes */}
       <ChatHeader companion={companion} onMessagesCleared={onMessagesCleared} /> {/* 🧑‍💼 Chat header */}
-      <div className="flex-1 overflow-y-auto"> {/* 📂 Chat messages container */}
+      <div className="flex-1 overflow-y-auto scrollbar-hide scrollbar-hover"> {/* 📂 Chat messages container with global scrollbar classes */}
         <ChatMessages
           messages={messages}
           isLoading={isLoading}
           companion={companion}
         />
-        <div ref={scrollRef} /> {/* 📍 Scroll reference */}
+        {/* 📍 Scroll reference div removed to disable auto-scroll */}
       </div>
       <ChatForm
         isLoading={isLoading}
@@ -170,7 +161,7 @@ export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
         inputRef={inputRef}
         handleInputChange={(e) => {
           setInput(e.target.value);
-          console.log("📝 Input changed:", e.target.value);
+          console.log("📝 Input changed:", e.target.value); // 📝 Log input changes
         }}
         onSubmit={handleSubmit}
       /> {/* 📝 Chat form */}

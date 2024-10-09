@@ -1,4 +1,4 @@
-// C:\AI_src\Companion_UI\SaaS-AI-Companion\src\components\chat-form.tsx
+//src\components\chat-form.tsx
 
 "use client";
 
@@ -23,7 +23,7 @@ export const ChatForm = ({
   isLoading
 }: ChatFormProps) => {
   return (
-    <form onSubmit={onSubmit} className="border-t border-primary/10 w-full px-2 py-4 md:px-12 flex items-center gap-x-1">
+    <form onSubmit={onSubmit} className="border-t border-primary/10 w-full px-6 md:px-20 py-6 flex items-center gap-x-2"> {/* Adjusted padding */}
       <Input 
         disabled={isLoading}
         value={input}

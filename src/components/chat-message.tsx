@@ -1,21 +1,17 @@
-// Relative Path: /src/components/chat-message.tsx
-
 "use client";
 
 import { BotAvatar } from "@/components/bot-avatar"; // 🧑‍💼 Bot avatar component
 import { Button } from "@/components/ui/button"; // 🔘 Reusable button component
-import { useToast } from "@/components/ui/use-toast"; // 🛠️ Hook for toast notifications
 import { UserAvatar } from "@/components/user-avatar"; // 👤 User avatar component
 import { cn } from "@/lib/utils"; // 🧩 Utility for conditional classNames
 import { Pencil, Copy } from "lucide-react"; // 📦 Icons for edit and copy functionalities
 import { useTheme } from "next-themes"; // 🎨 Hook to access current theme
 import { BeatLoader } from "react-spinners"; // 🌀 Loader component for loading states
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"; // 🖥️ Syntax highlighter for code blocks
-import { darcula } from "react-syntax-highlighter/dist/cjs/styles/prism"; // 🌑 Dark theme for syntax highlighting
+import CodeSnippet from "@/components/ui/code-snippet"; // 🖥️ Separate CodeSnippet component
 
 export interface ChatMessageProps {
   id?: string;
-  role: "system" | "user"; // 👥 Role of the message sender
+  role: "system" | "user" | "bot"; // 👥 Role of the message sender (added bot role for clarity)
   content?: string;
   isLoading?: boolean;
   src?: string; // 🌐 Source URL for avatars
@@ -27,7 +23,6 @@ export const ChatMessage = ({
   isLoading,
   src,
 }: ChatMessageProps) => {
-  const { toast } = useToast(); // 🔔 Toast notification handler
   const { theme } = useTheme(); // 🌗 Current theme (light/dark)
 
   // 📋 Function to handle copying message content to clipboard
@@ -39,110 +34,67 @@ export const ChatMessage = ({
 
     navigator.clipboard.writeText(content); // 📋 Write content to clipboard
     console.log("📋 Message copied to clipboard:", content); // 📝 Log successful copy action
-    toast({
-      description: "Message copied to clipboard.",
-      duration: 3000,
-    });
   };
 
   // ✏️ Function to handle editing the message
   const onEdit = () => {
     console.log("✏️ Edit button clicked for message:", content); // 📝 Log edit action
-    // Add your editing logic here
   };
 
-  // 📋 Function to handle copying code snippets to clipboard
-  const onCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code); // 📋 Write code to clipboard
-    console.log("📋 Code snippet copied to clipboard:", code); // 📝 Log successful code copy action
-    toast({
-      description: "Code copied to clipboard.",
-      duration: 3000,
-    });
-  };
-
-  // 📝 Function to render message content with support for code snippets
+  // 📝 Function to render message content with support for code snippets using CodeSnippet component
   const renderContent = () => {
     const regex = /```(\w+)?\n([\s\S]*?)```/g; // 🔍 Regex to detect code blocks
-    const parts = []; // 📦 Array to hold rendered content parts
-    let lastIndex = 0; // 🔢 Track the last index processed
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
     let match;
 
-    // 🔄 Iterate over all code block matches in the content
+    // Iterate through the content and detect both text and code blocks
     while ((match = regex.exec(content)) !== null) {
-      const [fullMatch, lang, code] = match; // 📝 Destructure match results
-      const index = match.index; // 📍 Start index of the match
+      const [fullMatch, lang, code] = match;
+      const index = match.index;
 
-      // 📝 Add text before the code block as a paragraph
+      // Handle any text before the code block
       if (lastIndex < index) {
-        const text = content.substring(lastIndex, index);
-        parts.push(
-          <p key={lastIndex} className="mb-2">
-            {text}
+        const text = content.substring(lastIndex, index).split("\n\n").map((paragraph, i) => (
+          <p key={`text-${lastIndex}-${i}`} className="mb-2 break-words">
+            {paragraph.trim()}
           </p>
-        );
+        ));
+        parts.push(...text);
       }
 
-      // 🖥️ Render the detected code block with syntax highlighting
+      // Render the code block using the CodeSnippet component
       parts.push(
-        <div
+        <CodeSnippet
           key={index}
-          className="flex md:flex-col items-start w-full px-0.5" // 📱 Adjusted to items-start and minimal padding
-        >
-          {/* 🏷️ Code Block Header */}
-          <div className="w-full flex justify-between items-center bg-gray-800 bg-opacity-75 text-gray-200 px-0.5 py-1 rounded-t-lg">
-            <span className="text-xl font-medium ml-2">{lang || "javascript"}</span> {/* 📄 Language Label */}
-            <Button
-              onClick={() => onCopyCode(code)} // 📂 Handle copy code action on click
-              variant="ghost"
-              size="icon"
-            >
-              <Copy className="w-4 h-4" /> {/* 📋 Copy icon */}
-            </Button>
-          </div>
-          {/* 🖥️ Syntax Highlighted Code Block */}
-          <SyntaxHighlighter
-            language={lang || "javascript"} // 🖥️ Language for syntax highlighting, default to JavaScript
-            style={darcula} // 🌑 Apply dark theme
-            showLineNumbers // 🔢 Show line numbers in code block
-            customStyle={{
-              backgroundColor: "#000000", // ⚫ Black background for code blocks
-              borderRadius: "0 0 0.5rem 0.5rem", // 🔲 Rounded bottom corners
-              padding: "16px", // 🖼️ Padding inside the code block
-              marginTop: "0", // 📏 Remove top margin to align with header
-              marginBottom: "8px", // 📏 Bottom margin
-              color: "#f8f8f2", // 🖋️ Light text for better readability
-              width: "100%", // 📐 Make code block take full width
-              maxWidth: "448px", // 📏 Aligned max-width with parent container's max-w-md (448px)
-            }}
-          >
-            {code} {/* 📝 Code content to be highlighted */}
-          </SyntaxHighlighter>
-        </div>
+          code={code} // 📝 Code content to be highlighted
+          language={lang || "javascript"} // 📄 Language label with default to JavaScript
+        />
       );
 
-      lastIndex = index + fullMatch.length; // 🔢 Update last processed index
-      console.log("🔍 Detected and rendered a code block."); // 📝 Log code block rendering
+      lastIndex = index + fullMatch.length;
     }
 
-    // 📝 Add any remaining text after the last code block as a paragraph
+    // Handle any remaining text after the last code block
     if (lastIndex < content.length) {
-      const text = content.substring(lastIndex);
-      parts.push(
-        <p key={lastIndex} className="mb-2">
-          {text}
+      const remainingText = content.substring(lastIndex).split("\n\n").map((paragraph, i) => (
+        <p key={`text-${lastIndex}-${i}`} className="mb-2 break-words">
+          {paragraph.trim()}
         </p>
-      );
+      ));
+      parts.push(...remainingText);
     }
 
-    return parts; // 🗂️ Return all rendered content parts
+    return parts;
   };
 
   return (
     <div
       className={cn(
-        "group flex items-start gap-x-2 py-2 w-full", // 📏 Maintain full width on all screen sizes
-        role === "user" ? "justify-end" : "justify-start" // 👤 Adjust alignment for user and bot messages
+        "group flex items-start gap-x-2 py-2 max-w-full", // Full width on all screens
+        role === "user"
+          ? "justify-end w-full md:w-1/2 ml-auto"  // User: right-aligned, 50% on medium and larger screens
+          : "justify-center w-full md:w-full" // Bot: centered, full width on medium and larger screens
       )}
     >
       {role === "user" && (
@@ -151,32 +103,52 @@ export const ChatMessage = ({
           className="opacity-0 group-hover:opacity-100 transition" // 👀 Show button on hover
           size="icon" // 📏 Button size
           variant="ghost" // 🎨 Button variant
+          aria-label="Edit message" // 🧑‍💻 Accessibility label
         >
           <Pencil className="w-4 h-4" /> {/* ✏️ Edit icon */}
         </Button>
       )}
-      {role !== "user" && src && <BotAvatar src={src} />} {/* 👤 Bot avatar */}
-      <div className="rounded-md bg-primary/10 px-4 py-4 w-full max-w-full sm:max-w-md md:max-w-md text-sm md:text-base">
+
+      {/* Hide the Bot Avatar on mobile */}
+      {role === "bot" && src && (
+        <div className="hidden md:block"> {/* Hide avatar on mobile */}
+          <BotAvatar src={src} />
+        </div>
+      )}
+
+      {/* 📦 Message Content Container */}
+      <div
+        className={cn(
+          "rounded-md px-6 md:px-6 py-4 md:py-4 w-full overflow-hidden flex-1", // 📐 Responsive padding, prevent overflow, take remaining space
+          role === "bot" ? "bg-transparent" : "bg-primary/10", // Make Bot messages transparent and User messages with a background
+          "text-base md:text-base" // 🔤 Responsive text size
+        )}
+      >
         {/* 🌀 Display loader if the message is loading */}
         {isLoading ? (
           <>
-            <BeatLoader size={5} color={theme === "light" ? "black" : "white"} /> {/* 🌀 Loading spinner */}
+            <BeatLoader
+              size={5}
+              color={theme === "light" ? "black" : "white"}
+            /> {/* 🌀 Loading spinner */}
             <span className="sr-only">Loading...</span> {/* 📡 Loading state visually hidden for accessibility */}
           </>
         ) : (
           <div>
             {renderContent()} {/* 📝 Render the formatted content */}
-            <p className="text-xs text-gray-500 mt-1">🖨️ Content rendered successfully.</p> {/* 🖨️ Log successful content rendering */}
           </div>
         )}
       </div>
+
       {role === "user" && <UserAvatar />} {/* 👤 User avatar */}
-      {role !== "user" && !isLoading && (
+
+      {role === "bot" && !isLoading && (
         <Button
           onClick={onCopy} // 📂 Handle copy action on click
           className="opacity-0 group-hover:opacity-100 transition" // 👀 Show button on hover
           size="icon" // 📏 Button size
           variant="ghost" // 🎨 Button variant
+          aria-label="Copy message" // 🧑‍💻 Accessibility label
         >
           <Copy className="w-4 h-4" /> {/* 📋 Copy icon */}
         </Button>

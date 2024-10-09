@@ -1,4 +1,4 @@
-// Relative Path: /src/app/(chat)/layout.tsx
+// src/app/(chat)/layout.tsx
 
 import { Navbar } from "@components/navbar"; // 🧭 Navbar component
 import { Sidebar } from "@components/sidebar"; // 🖥️ Sidebar component for desktop
@@ -33,6 +33,8 @@ interface Thread {
 
 const ChatLayout = async ({ children }: ChatLayoutProps) => {
   try {
+    console.log("🔧 Initializing ChatLayout component...");
+
     const reqHeaders = headers();
     const host = reqHeaders.get("host") || "";
     const protocol = reqHeaders.get("x-forwarded-proto") || "http";
@@ -73,22 +75,22 @@ const ChatLayout = async ({ children }: ChatLayoutProps) => {
     console.log("📈 Sorted threads by lastMessageAt descending:", threads);
 
     return (
-      <div className="h-screen flex overflow-hidden">
+      <div className="h-screen flex overflow-hidden scrollbar-hide scrollbar-hover"> {/* 🌀 Applied global scrollbar classes */}
         {/* 🧭 Navbar */}
         <Navbar isPro={isPro} threads={threads} />
 
         {/* 🗂 Sidebar for larger screens */}
-        <div className="hidden md:flex mt-16 w-72 flex-col fixed inset-y-0">
+        <div className="hidden md:flex mt-16 w-72 flex-col fixed inset-y-0 scrollbar-hide scrollbar-hover"> {/* 🌀 Applied global scrollbar classes */}
           <Sidebar isPro={isPro} threads={threads} />
         </div>
 
         {/* 📱 Mobile Sidebar for smaller screens */}
-        <div className="md:hidden fixed inset-y-0 left-0 z-40">
+        <div className="md:hidden fixed inset-y-0 left-0 z-40 scrollbar-hide scrollbar-hover"> {/* 🌀 Applied global scrollbar classes */}
           <MobileSidebar isPro={isPro} threads={threads} />
         </div>
 
         {/* 🖥️ Main content area */}
-        <main className="flex-1 pt-16 md:pl-72 overflow-y-auto">
+        <main className="flex-1 pt-16 md:pl-72 overflow-y-auto scrollbar-hide scrollbar-hover"> {/* 🌀 Applied global scrollbar classes */}
           <div className="w-full h-full">
             {children}
           </div>
@@ -99,7 +101,7 @@ const ChatLayout = async ({ children }: ChatLayoutProps) => {
     console.error("❌ Error in ChatLayout:", error);
     return (
       <div className="flex items-center justify-center h-full">
-        An error occurred while loading the page.
+        ❌ An error occurred while loading the page.
       </div>
     );
   }
