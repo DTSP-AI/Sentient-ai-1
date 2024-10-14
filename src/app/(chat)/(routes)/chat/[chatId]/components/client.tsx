@@ -1,4 +1,4 @@
-// src\app\(chat)\(routes)\chat\[chatId]\components\client.tsx
+// Path: src/app/(chat)/routes/chat/[chatId]/components/client.tsx
 
 "use client";
 
@@ -22,11 +22,12 @@ interface ChatClientProps {
       interactionStyle: string;
     };
   };
+  initialMessages: ChatMessageProps[];
 }
 
-export const ChatClient = ({ companion }: ChatClientProps) => {
+export const ChatClient = ({ companion, initialMessages }: ChatClientProps) => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatMessageProps[]>([]);
+  const [messages, setMessages] = useState<ChatMessageProps[]>(initialMessages);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
@@ -37,11 +38,14 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
+        console.log("🚀 Fetching messages for chat:", companion.id);
         const response = await fetch(`/api/chat/${companion.id}/messages`);
         if (!response.ok) {
           throw new Error("Failed to fetch messages.");
         }
         const data = await response.json();
+        console.log("📨 Fetched messages:", data);
+
         const fetchedMessages: ChatMessageProps[] = data.map((msg: Message) => ({
           id: msg.id,
           role: msg.role as "system" | "user",
@@ -52,10 +56,11 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
         // Store fetched messages in localStorage
         localStorage.setItem(`chat_${companion.id}`, JSON.stringify(fetchedMessages));
       } catch (error) {
-        console.error("Error fetching messages:", error);
+        console.error("❌ Error fetching messages:", error);
         // If fetch fails, try to load from localStorage
         const storedMessages = localStorage.getItem(`chat_${companion.id}`);
         if (storedMessages) {
+          console.log("🗄️ Loaded messages from localStorage.");
           setMessages(JSON.parse(storedMessages));
         }
       }
@@ -92,6 +97,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
     localStorage.setItem(`chat_${companion.id}`, JSON.stringify(updatedMessages));
 
     setIsLoading(true);
+    console.log("⌨️ Sending user message:", userMessage);
 
     try {
       const response = await fetch(`/api/chat/${companion.id}`, {
@@ -107,6 +113,8 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
       }
 
       const { systemMessage } = await response.json();
+      console.log("🤖 AI response received:", systemMessage);
+
       const aiMessage: ChatMessageProps = {
         id: (Date.now() + 1).toString(),
         role: "system",
@@ -118,7 +126,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
       localStorage.setItem(`chat_${companion.id}`, JSON.stringify(newMessages));
       setInput("");
     } catch (error) {
-      console.error("Failed to generate response:", error);
+      console.error("❌ Failed to generate response:", error);
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +136,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
   const onMessagesCleared = () => {
     setMessages([]); // Clear the state
     localStorage.removeItem(`chat_${companion.id}`); // Clear local storage
+    console.log("🗑️ Cleared all messages.");
   };
 
   return (

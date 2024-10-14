@@ -1,4 +1,4 @@
-// File: C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\api\chat\[chatId]\route.ts
+// File: C:\AI_src\Companion_UI\Companion-ai\src\app\api\chat\[chatId]\route.ts
 import * as entry from '../../../../../../src/app/api/chat/[chatId]/route.js'
 import type { NextRequest } from 'next/server.js'
 

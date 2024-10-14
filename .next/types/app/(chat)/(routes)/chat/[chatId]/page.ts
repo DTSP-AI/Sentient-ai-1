@@ -1,4 +1,4 @@
-// File: C:\AI_src\Companion_UI\SaaS-AI-Companion\src\app\(chat)\(routes)\chat\[chatId]\page.tsx
+// File: C:\AI_src\Companion_UI\Companion-ai\src\app\(chat)\(routes)\chat\[chatId]\page.tsx
 import * as entry from '../../../../../../../src/app/(chat)/(routes)/chat/[chatId]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

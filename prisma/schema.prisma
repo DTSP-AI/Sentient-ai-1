@@ -1,3 +1,5 @@
+// C:\AI_src\Companion_UI\SaaS-AI-Companion\prisma\schema.prisma
+
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextIndex", "fullTextSearch"]
@@ -29,6 +31,19 @@ model Companion {
   src                  String
   category             Category  @relation(fields: [categoryId], references: [id])
   messages             Message[]
+
+  // Trait scales
+  humor                Int       @default(3)
+  empathy              Int       @default(3)
+  assertiveness        Int       @default(3)
+  sarcasm              Int       @default(3)
+
+  // Moderation metrics
+  hateModeration       Int       @default(3)
+  harassmentModeration Int       @default(3)
+  violenceModeration   Int       @default(3)
+  selfHarmModeration   Int       @default(3)
+  sexualModeration     Int       @default(3)
 
   @@index([categoryId])
 }
