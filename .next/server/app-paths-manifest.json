@@ -1,4 +1,9 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+<<<<<<< HEAD
   "/(root)/(routes)/page": "app/(root)/(routes)/page.js"
+=======
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/(chat)/(routes)/chat/[chatId]/page": "app/(chat)/(routes)/chat/[chatId]/page.js"
+>>>>>>> e6b617adb1953f4698fa1d5cf56e3946023b9174
 }

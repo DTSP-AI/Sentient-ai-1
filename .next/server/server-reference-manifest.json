@@ -2,15 +2,27 @@
   "node": {
     "0f61427550885802733967707a5078679ea5bc62": {
       "workers": {
+<<<<<<< HEAD
         "app/(root)/(routes)/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CCompanion-ai%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!",
         "app/_not-found/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CCompanion-ai%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!"
       },
       "layer": {
         "app/(root)/(routes)/page": "action-browser",
+=======
+        "app/(chat)/(routes)/chat/[chatId]/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CCompanion-ai%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!",
+        "app/_not-found/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CAI_src%5C%5CCompanion_UI%5C%5CCompanion-ai%5C%5Cnode_modules%5C%5C%40clerk%5C%5Cnextjs%5C%5Cdist%5C%5Cesm%5C%5Capp-router%5C%5Cserver-actions.js%22%2C%5B%22invalidateCacheAction%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/(chat)/(routes)/chat/[chatId]/page": "action-browser",
+>>>>>>> e6b617adb1953f4698fa1d5cf56e3946023b9174
         "app/_not-found/page": "action-browser"
       }
     }
   },
   "edge": {},
+<<<<<<< HEAD
   "encryptionKey": "ySgtHcv7p2lFnHEMWiR8bMZE35TBZMpKzBD35PnjiVU="
+=======
+  "encryptionKey": "FTLNAb+myxWGFqCZtzHBpX0qPUZ1TjMDbzeeH90T9qg="
+>>>>>>> e6b617adb1953f4698fa1d5cf56e3946023b9174
 }

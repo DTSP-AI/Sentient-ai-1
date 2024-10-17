@@ -1,5 +1,6 @@
 {
   "pages": {
+<<<<<<< HEAD
     "/(root)/(routes)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -10,6 +11,18 @@
       "static/chunks/main-app.js",
       "static/css/app/(root)/layout.css",
       "static/chunks/app/(root)/layout.js"
+=======
+    "/(chat)/(routes)/chat/[chatId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(chat)/(routes)/chat/[chatId]/page.js"
+    ],
+    "/(chat)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(chat)/layout.css",
+      "static/chunks/app/(chat)/layout.js"
+>>>>>>> e6b617adb1953f4698fa1d5cf56e3946023b9174
     ],
     "/layout": [
       "static/chunks/webpack.js",
