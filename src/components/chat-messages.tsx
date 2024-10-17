@@ -2,7 +2,7 @@
 
 "use client";
 
-import { ElementRef, useEffect, useRef, useState } from "react"; // 🔄 React hooks for state and effects
+import { useRef, useState } from "react"; // 🔄 React hooks for state and references
 import { Companion } from "@prisma/client"; // 🗃️ Prisma client for database models
 import { ChatMessage, ChatMessageProps } from "@/components/chat-message"; // 💬 Chat message components
 
@@ -17,42 +17,45 @@ export const ChatMessages = ({
   isLoading,
   companion,
 }: ChatMessagesProps) => {
-  const scrollRef = useRef<ElementRef<"div">>(null); // 📍 Reference to the scroll container
+  const scrollContainerRef = useRef<HTMLDivElement>(null); // 📍 Reference to the scrollable container
+  const scrollRef = useRef<HTMLDivElement>(null); // 📍 Reference to the scroll-to-bottom element
 
   // 🌀 State to control the fake loading animation
-  const [fakeLoading, setFakeLoading] = useState(messages.length === 0);
+  const [fakeLoading, setFakeLoading] = useState(messages.length === 0); // 🟢 Initializes fakeLoading to true if there are no messages
 
-  // ⏰ useEffect to handle fake loading when the component mounts
-  useEffect(() => {
-    const timeout = setTimeout(() => {
+  // 🕒 Handle fake loading without useEffect
+  if (fakeLoading) {
+    setTimeout(() => {
       setFakeLoading(false); // ⏳ Fake loading completed
-      console.log("⏳ Fake loading animation ended.");
+      console.log("⏳ Fake loading animation ended."); // 📝 Log fake loading completion
     }, 1000); // ⏱️ 1-second delay for fake loading
+  }
 
-    // 🧹 Clean up the timeout to prevent memory leaks
-    return () => {
-      clearTimeout(timeout);
-      console.log("🧹 Cleaned up fake loading timeout.");
-    };
-  }, []);
-
-  // 🔄 useEffect to scroll to the bottom when new messages are added
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" }); // 📜 Smooth scroll to bottom
-      console.log("📍 Scrolled to the bottom of chat messages.");
+  // 📍 Scroll to bottom without useEffect
+  if (scrollContainerRef.current) {
+    // 📋 Check if the latest message is from the system
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === "system") {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight, // 📏 Scroll to the bottom of the container
+        behavior: "smooth",
+      });
+      console.log("📍 Scrolled to the bottom of chat messages."); // 📝 Log scrolling action
     }
-  }, [messages]); // 📥 Dependency on messages array
+  }
 
   return (
-    <div className="flex-1 overflow-y-auto pr-4 h-full"> {/* 🖥️ Container for chat messages with vertical scrolling and full height */}
+    <div
+      ref={scrollContainerRef}
+      className="flex-1 overflow-y-auto px-6 md:px-20 py-4 md:py-6 h-full scrollbar-hide scrollbar-hover" // Increased padding horizontally and vertically
+    >
       {/* 💬 Introductory message from the companion */}
       <ChatMessage
         id="intro-message" // 🆔 Unique ID for the introductory message
         role="system" // 🧑‍💼 Role indicating system/bot message
         content={`Hello, I'm ${companion.name}. ${companion.shortDescription}`} // 📝 Introductory content
         src={companion.src} // 🌐 Avatar source for the companion
-        isLoading={fakeLoading} // ⏳ Loading state
+        isLoading={fakeLoading} // ⏳ Loading state controlled by fakeLoading
       />
       {/* 💬 Map through and render each chat message */}
       {messages.map((message) => (
@@ -75,7 +78,7 @@ export const ChatMessages = ({
         />
       )}
       {/* 📍 Reference div for scrolling to the bottom */}
-      <div ref={scrollRef} />
+      <div ref={scrollRef} /> {/* 📍 Invisible div to maintain scroll reference */}
     </div>
   );
 };
