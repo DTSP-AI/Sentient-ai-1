@@ -1,3 +1,5 @@
+//src\app\api\companion\[companionId]\history\route.ts
+
 import { MemoryManager } from "@/lib/memory";
 import prismadb from "@/lib/prismadb";
 import { currentUser } from "@clerk/nextjs/server";
