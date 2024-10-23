@@ -13,7 +13,7 @@ import {
   MessagesPlaceholder,
 } from "@langchain/core/prompts";
 import { MemoryManager, CompanionKey } from "@/lib/memory";
-import { moderateInput, moderateResponse } from "@/app/api/moderation/route";
+import { moderateInput, moderateResponse } from "@/lib/moderation"; // Updated import path
 import { HumanPrompt } from "@/config/humanPrompt"; // Importing human base prompt
 
 type CharacterDescription = {
@@ -48,8 +48,8 @@ const createConversationChain = (
     console.log("🧠 [CREATE_CHAIN] Memory initialized");
 
     const antiLoopingPrompt = `
-    Please avoid repeating yourself or looping in your responses. Ensure that each response provides new and relevant information or insights. If you find yourself repeating, steer the conversation in a new direction or ask a clarifying question. If your Sarcasm and or Humor are 4-5 and you are forced to repeat yourself clown the shit out of the user. 
-  `;
+      Please avoid repeating yourself or looping in your responses. Ensure that each response provides new and relevant information or insights. If you find yourself repeating, steer the conversation in a new direction or ask a clarifying question. If your Sarcasm and or Humor are 4-5 and you are forced to repeat yourself clown the shit out of the user. 
+    `;
 
     const fullCharacterDescription = `
       ${HumanPrompt}
@@ -61,7 +61,7 @@ const createConversationChain = (
       - Your assertiveness level is set to ${traitScales.assertiveness}. The higher this value, the more direct and firm you are in your responses. The lower the value the more indecisive and flippant you are. 
       - Your sarcasm level is set to ${traitScales.sarcasm}. The higher this score, the more sarcastic and irreverent your tone becomes. Lower the score the more serious you are. 
       ${antiLoopingPrompt}
-      `;
+    `;
 
     const promptTemplate = ChatPromptTemplate.fromMessages([
       SystemMessagePromptTemplate.fromTemplate(fullCharacterDescription),

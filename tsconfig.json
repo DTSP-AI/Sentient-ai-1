@@ -1,22 +1,22 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
+    "target": "es2020", // Specifies the ECMAScript target version.
+    "module": "commonjs", // Specifies the module code generation.
     "lib": [
       "dom",
       "es2020"
     ],
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "outDir": "./dist",
-    "baseUrl": "./src",
+    "strict": true, // Enables all strict type-checking options.
+    "esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules.
+    "skipLibCheck": true, // Skips type checking of all declaration files.
+    "forceConsistentCasingInFileNames": true, // Disallows inconsistently-cased references to the same file.
+    "moduleResolution": "node", // Specifies module resolution strategy.
+    "resolveJsonModule": true, // Allows importing modules with a '.json' extension.
+    "isolatedModules": true, // Ensures that each file can be safely transpiled without relying on other imports.
+    "jsx": "preserve", // Preserves JSX as part of the output to be further handled by another transform step.
+    "incremental": true, // Enables incremental compilation for faster build times.
+    "outDir": "./dist", // Redirects output structure to the directory.
+    "baseUrl": "./src", // Base directory to resolve non-absolute module names.
     "paths": {
       "@/*": [
         "*"
@@ -37,24 +37,24 @@
         "scripts/*"
       ]
     },
-    "allowJs": true,
-    "noEmit": true,
+    "allowJs": true, // Allows JavaScript files to be compiled.
+    "noEmit": true, // Prevents emitting files from a compilation.
     "plugins": [
       {
-        "name": "next"
+        "name": "next" // Integrates Next.js TypeScript plugin.
       }
     ],
-    "types": ["@prisma/client", "node"] // Add this line
+    "types": ["@prisma/client", "node"] // Includes type declarations for Prisma and Node.js.
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "prisma/**/*.ts" // Add this line
+    "prisma/**/*.ts" // Includes Prisma TypeScript files.
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist" // Excludes the distribution directory.
   ]
 }
