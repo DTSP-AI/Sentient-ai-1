@@ -1,15 +1,20 @@
 # ---------------------------
+# Next.js
+# ---------------------------
+
+# Next.js build output
+.next/
+out/
+
+# ---------------------------
 # Node.js
 # ---------------------------
 
 # Dependencies
-/node_modules/
+node_modules/
 
 # Optional npm cache directory
 .npm/
-
-# Optional eslint cache
-.eslintcache
 
 # Optional REPL history
 .node_repl_history
@@ -18,39 +23,25 @@
 *.tgz
 
 # ---------------------------
-# Next.js
-# ---------------------------
-
-# Next.js build output
-/.next/
-/out/
-
-# Next.js static export
-/out/
-
-# Next.js public folder cache
-/public/cache/
-
-# ---------------------------
 # Testing
 # ---------------------------
 
 # Coverage directory used by tools like Jest
-/coverage/
+coverage/
 
 # ---------------------------
 # Production
 # ---------------------------
 
 # Production build output
-/build/
+build/
 
 # ---------------------------
 # Logs
 # ---------------------------
 
 # Log files
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -88,7 +79,7 @@ Desktop.ini
 .history/
 
 # JetBrains IDEs (e.g., WebStorm, IntelliJ)
-/.idea/
+.idea/
 
 # Sublime Text
 *.sublime-workspace
@@ -103,23 +94,3 @@ tmp/
 temp/
 *.tmp
 *.temp
-
-# Lock files (ensure only package-lock.json or yarn.lock is tracked)
-/package-lock.json
-/yarn.lock
-/pnpm-lock.yaml
-
-# Ignore if you want to track only package.json
-# Uncomment the following lines if you prefer tracking lock files
-# !package-lock.json
-# !yarn.lock
-# !pnpm-lock.yaml
-
-# ---------------------------
-# Optional: Custom Exclusions
-# ---------------------------
-
-# If you have specific directories or files to exclude, add them here
-# Example:
-/path/to/excluded-directory/
-/path/to/excluded-file.js
