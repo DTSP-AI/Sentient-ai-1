@@ -3,7 +3,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { moderateInput, moderateResponse } from "@/lib/moderation";
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+// Only export the route handler
+export const POST = async (req: NextRequest): Promise<NextResponse> => {
   try {
     console.log("[POST_MODERATION] Received POST request for moderation.");
 
@@ -27,4 +28,4 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: 500 }
     );
   }
-}
+};
