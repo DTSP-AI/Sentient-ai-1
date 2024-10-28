@@ -1,25 +1,22 @@
 // Path: src/app/api/moderation/route.ts
 
-/**
- * @file route.ts
- * @description Handles POST requests for input moderation using OpenAI's Moderation API.
- */
-
 import { NextRequest, NextResponse } from "next/server";
-import { moderateInput } from "@/lib/moderation"; // Importing from the moderation library
+import { moderateInput, moderateResponse } from "@/lib/moderation";
 
-// ================================================
-// Function: POST
-// Description: Handles POST requests for input moderation.
-// ================================================
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     console.log("[POST_MODERATION] Received POST request for moderation.");
 
-    const { input } = await req.json(); // Extract input from request body
+    const { input, type } = await req.json();
+    console.log("[POST_MODERATION] Received request type:", type);
     console.log("[POST_MODERATION] Extracted input:", input);
 
-    const moderationResult = await moderateInput(input); // Using the imported function
+    let moderationResult;
+    if (type === 'response') {
+      moderationResult = await moderateResponse(input);
+    } else {
+      moderationResult = await moderateInput(input);
+    }
     console.log("[POST_MODERATION] Moderation result:", moderationResult);
 
     return NextResponse.json(moderationResult);
