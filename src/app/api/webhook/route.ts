@@ -1,9 +1,6 @@
 // Path: src/app/api/webhook/route.ts
-import { NextResponse } from "next/server";
+export const dynamic = 'force-dynamic';
 
 export async function POST() {
-  console.log("⚠️ [WEBHOOK] Stripe webhooks are disabled");
-  return NextResponse.json({ 
-    message: 'Stripe webhooks are disabled'
-  }, { status: 503 });
+  return new Response(null, { status: 410 }); // Gone
 }
