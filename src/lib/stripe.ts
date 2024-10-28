@@ -1,12 +1,8 @@
-// Path: src/lib/stripe.ts
-export const stripe = {
-  webhooks: {
-    constructEvent: () => {
-      throw new Error('Stripe is disabled');
-    }
-  }
-<<<<<<< HEAD
-};
-=======
-};
->>>>>>> 6be64db33c438bc5af241500909ab28087d5487d
+//C:\AI_src\Companion_UI\SaaS-AI-Companion\src\lib\stripe.ts
+
+import Stripe from "stripe";
+
+export const stripe = new Stripe(process.env.STRIPE_API_KEY!, {
+  apiVersion: "2023-08-16" as any,
+  typescript: true,
+});
